@@ -4,6 +4,11 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.8.1] — 2026-07-03
+
+### Added
+- README Install section gained a documented prerequisite: the `## CLAUDE.md hygiene` section in the user's global `~/.claude/CLAUDE.md` is a hard dependency for `/tidyclaudemd:claudemd-tidy` regardless of install method, and was previously undocumented — a fresh plugin install with no prior manual-install history would have installed successfully then failed on first use with no explanation (user feedback, 2026-07-03).
+
 ## [0.8.0] — 2026-07-03
 
 _Executes `plans/plugin-packaging-plan.md` phases 1-5 and 7 in one release (user request, 2026-07-03): the rename, the path-portability fix, the manifest files, the reflect skill's versioning-integration sub-step, a local `--plugin-dir` test, and this README rewrite. Phase 6 (external marketplace-flow verification from a genuinely separate machine/checkout) is explicitly not done — it isn't verifiable from within the session/machine that authored the plugin._

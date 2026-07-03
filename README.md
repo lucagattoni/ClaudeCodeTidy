@@ -1,6 +1,6 @@
 # TidyClaudeMD
 
-**Version 0.8.0** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that keep every repo's `CLAUDE.md` slim without losing information — and that improve themselves from the experience of real runs.
+**Version 0.8.1** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that keep every repo's `CLAUDE.md` slim without losing information — and that improve themselves from the experience of real runs.
 
 Distributed as a single Claude Code plugin, `tidyclaudemd`, bundling both skills. This repo is the plugin **and** its own marketplace — no separate repo to publish to.
 
@@ -10,6 +10,8 @@ Distributed as a single Claude Code plugin, `tidyclaudemd`, bundling both skills
 | [`/tidyclaudemd:claudemd-tidy-reflect`](skills/claudemd-tidy-reflect/SKILL.md) | Learn from recorded runs and meta-improve the suite itself |
 
 ## Install
+
+**Prerequisite** — `/tidyclaudemd:claudemd-tidy` reads its rules from a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in your **global** `~/.claude/CLAUDE.md`, regardless of install method (this predates the plugin and isn't installed *by* it — see invariant 5 below, "hygiene rules live only in `~/.claude/CLAUDE.md`"). If that section doesn't exist yet, Step 1 stops and reports rather than guessing at rules. This repo deliberately carries no copy of that section (same invariant), so there's no bundled template to point to — write your own numbered rules under that exact heading, covering what makes a CLAUDE.md line worth keeping.
 
 ```
 /plugin marketplace add lucagattoni/TidyClaudeMD
