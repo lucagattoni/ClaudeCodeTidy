@@ -1,8 +1,13 @@
-# Changelog — claude-md-tidy suite
+# Changelog — TidyClaudeMD
 
 All notable changes to the suite (`claude-md-tidy` + `claude-md-tidy-reflect`). Follows semantic versioning; one version for the whole suite. Entries produced by the self-improvement loop cite the run record that motivated them as `(run: YYYY-MM-DD <repo>)`.
 
 ## [Unreleased]
+
+## [0.7.1] — 2026-07-03
+
+### Fixed
+- Project branding left over from before the repo rename: README.md's title, its file-layout diagram's root directory name, CHANGELOG.md's title, and the reflect skill's frontmatter description all still said "claude-md-tidy suite" / `claudemd-tidy` instead of `TidyClaudeMD` (user feedback, 2026-07-03).
 
 ## [0.7.0] — 2026-07-03
 
