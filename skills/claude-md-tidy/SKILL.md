@@ -1,7 +1,7 @@
 ---
 name: claude-md-tidy
 description: Scan every CLAUDE.md in the current repo against the global "CLAUDE.md hygiene" rules and slim it by relocating/compressing content — never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md.
-version: 0.3.1
+version: 0.4.0
 ---
 
 # /claude-md-tidy
@@ -91,6 +91,7 @@ Append a run record at the **top** of `~/.claude/skills/claude-md-tidy/RUNS.md` 
 ## YYYY-MM-DD — <repo> (<files processed>)
 - **Processed:** no
 - **Result:** <before> → <after> lines · <n> relocated · <n> compressed · <n> deleted · <n> challenged (or "analyze-only, not applied")
+- **Instructions exercised:** <for each non-KEEP verdict and each CHALLENGE, the SKILL.md step or test that produced it (e.g. "RELOCATE: Step 3 verdict table", "CHALLENGE: Step 2b Consistent?") — or "none (analyze-only found nothing to act on)". This is what lets `/claude-md-tidy-reflect` later tell which instructions are pulling weight across runs and which never fire.>
 - **User feedback:** <every amendment, CHALLENGE resolution, and remark the user made, verbatim-ish, each tagged:
   `[general → suggested home: tidy skill / reflect skill / global hygiene rules]` if the lesson would
   hold in other repos, or `[repo-specific]` if it only reflects this repo's context — or "none">

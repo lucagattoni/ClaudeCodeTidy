@@ -4,6 +4,16 @@ All notable changes to the suite (`claude-md-tidy` + `claude-md-tidy-reflect`). 
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-03
+
+### Added
+- Pruning signal: an instruction in `claude-md-tidy/SKILL.md` that never triggered across processed run records (never cited as the reason a CHALLENGE/DELETE/RELOCATE fired) is now a removal candidate, evidenced the same way an addition is; requires a Step 7 run-record format extension ("Instructions exercised") to be evaluable (competitive landscape review, 2026-07-03; `plans/v1.3.0-integrated-candidate-improvements.md` item 1).
+- Provisional lessons: a lesson drawn from a single run record is now marked `provisional` in both the CHANGELOG and the source `RUNS.md` record; a later run's contradicting evidence demotes/revisits it, a second independent corroboration promotes it (critical self-review, 2026-07-03; item 3).
+- `RUNS.md` archiving: fully-processed, non-provisional, unpinned records beyond the 3 most recent are moved (never deleted) into a new `RUNS-archive/` directory, keeping the always-loaded `RUNS.md` bounded. A `Pinned: yes` record marker exempts a record from archiving indefinitely (competitive landscape review, 2026-07-03; item 11 — applied as MINOR per explicit user decision, since it is purely additive; the suite's own file-layout-is-MAJOR reading was noted but not applied this round).
+
+### Changed
+- Run-record format (`claude-md-tidy` Step 7) gained an "Instructions exercised" field tracing which step/test produced each non-KEEP verdict and each CHALLENGE (prerequisite for the pruning signal above).
+
 ## [0.3.1] — 2026-07-03
 
 _Version counting restarted at 0.1 on 2026-07-03: the suite is not yet considered stable/public-ready, so the history below was renumbered from the original 1.0.0–1.2.1 down to 0.1.0–0.3.1, preserving the original bump sizes and dates exactly. No behavior changed by the renumbering itself._
