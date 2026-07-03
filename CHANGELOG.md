@@ -4,6 +4,20 @@ All notable changes to the suite (`claude-md-tidy` + `claude-md-tidy-reflect`). 
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-07-03
+
+### Added
+- Fifth line-interrogation question **Redundant-by-order?**: does an earlier-loaded scope (per Claude Code's config load order) already establish a line's intent regardless of exact wording? Requires Step 1 to read the whole global CLAUDE.md, not just the hygiene section. Routes to COMPRESS or CHALLENGE, never DELETE — same-intent-different-wording redundancy isn't a verbatim duplicate or a grep-confirmed dead reference, so widening DELETE's evidence rule to cover it would weaken protected invariant 3 (competitive landscape review, 2026-07-03; `plans/v1.3.0-integrated-candidate-improvements.md` item 13).
+- Target-finding (Step 2) now also globs the filesystem directly for gitignored personal-override filenames (`CLAUDE.local.md`-style), which `git ls-files` and a standard untracked-file check both miss entirely (competitive landscape review, 2026-07-03; item 14).
+- Documented an optional, advisory `PostToolUse` hook pattern (README) that reminds a user to run `/claude-md-tidy` when a CLAUDE.md crosses the hygiene guardrail between runs — opt-in, not shipped as part of either skill (competitive landscape review, 2026-07-03; item 12).
+- `claude-md-tidy-reflect` Step 1 gained a fourth evidence source: an ad-hoc lesson raised directly in an ordinary conversation, not tied to any recorded run — the conversation stands in as the citation (critical self-review, 2026-07-03; item 6).
+
+### Changed
+- RELOCATE's pointer requirement changed from "a one-line pointer" to a **rich-abstract pointer** — a short synopsis of the concrete fact(s) a reader would otherwise open the sub-doc for, plus the link — since a bare cross-reference gets opened anyway on any non-trivial task (competitive landscape review, 2026-07-03; item 10).
+- CHALLENGE items in Step 4's plan are now grouped by stakes (destructive/safety-relevant first, then widely-depended-on rules, then minor CHALLENGEs batched last) instead of presented as a flat list (critical self-review, 2026-07-03; item 5).
+- Step 2b's Consistent? question now actively probes common contradiction shapes (autonomy vs. ask-first, default vs. undocumented exception, conflicting thresholds, "always X" vs. a not-X case) instead of relying only on whatever a line-by-line read happens to surface (competitive landscape review, 2026-07-03; item 5).
+- `claude-md-tidy-reflect` Step 5's README-sync rule tightened from "if any documented feature changed" to "check the README bullet for every step touched this pass" (critical self-review, 2026-07-03; item 4).
+
 ## [0.6.0] — 2026-07-03
 
 ### Added

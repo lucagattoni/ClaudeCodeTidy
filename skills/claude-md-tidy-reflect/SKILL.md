@@ -1,7 +1,7 @@
 ---
 name: claude-md-tidy-reflect
 description: Self-improvement loop for the claude-md-tidy suite. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on claude-md-tidy.
-version: 0.6.0
+version: 0.7.0
 ---
 
 # /claude-md-tidy-reflect
@@ -21,6 +21,7 @@ Read all of: `claude-md-tidy/SKILL.md`, this skill's own `SKILL.md`, `claude-md-
 - Unprocessed run records from `RUNS.md`.
 - If invoked right after a tidy run in this session: the live experience (user amendments, questions, friction) — even before it's recorded.
 - If given a CLAUDE.md path: dry-run the tidy skill's analyze phase against it and note every point where the current instructions are ambiguous, silent, or force a question.
+- **An ad-hoc lesson described directly in the invoking conversation** — not tied to any recorded run or dry-run, e.g. feedback about CLAUDE.md quality or suite design raised in an ordinary conversation. The conversation itself (and, where one exists, a doc such as a plan/backlog file) stands in as the citation in place of a `RUNS.md` record.
 - Whether new evidence **corroborates or contradicts** an existing `provisional` lesson (records marked `Processed: yes (vX.Y.Z, provisional)` — see Step 5). A contradiction is itself top-priority evidence to revisit or demote that lesson, cited the same way a fresh lesson would be; a second, independent corroboration promotes it.
 
 **If there is no evidence, report that and stop.** Never invent improvements from first principles.
@@ -60,7 +61,7 @@ These invariants (documented in `claude-md-tidy/README.md` → Invariants) may *
    - **MINOR** — new step, new verdict, new signal, new capability.
    - **MAJOR** — changed workflow contract (phases, stop points, file layout). Always requires user approval, independent of the invariant gate.
 3. Add a `CHANGELOG.md` entry under the new version: each change on one line, ending with its evidence citation `(run: YYYY-MM-DD <repo>)`. A lesson drawn from a **single** run record is marked **provisional**: `(provisional, 1 occurrence — run: YYYY-MM-DD <repo>)`. When a second, independent run corroborates a provisional lesson, promote it: rewrite the original line to drop the `provisional` tag and cite both runs, rather than adding a second line for the same lesson.
-4. Update `README.md` in the same pass if any documented feature changed — never leave it describing superseded behavior.
+4. **Check the README bullet for every SKILL.md step touched this pass** — not just "if a documented feature changed" (easy to judge false when the change is subtle). If the edited step has a corresponding README bullet, update it in the same diff: paraphrase behavior and intent, never restate a step's normative test or wording verbatim. Never leave `README.md` describing superseded behavior.
 5. Mark consumed records in `RUNS.md`: `**Processed:** yes (vX.Y.Z)` — or `**Processed:** yes (vX.Y.Z, provisional)` if any lesson drawn from that record was applied provisionally in sub-step 3. When a provisional lesson is later promoted, update the *originating* record's marker in place to drop `, provisional`.
 6. **Archive fully-processed records.** A record is an archive candidate once it is `Processed: yes` **and not** `provisional` (a still-pending-corroboration provisional record is never archived). A user may also add `**Pinned:** yes` to any record to exempt it from archiving indefinitely, regardless of processed/provisional state. Keep the 3 most recent archive-eligible records in `RUNS.md`; move the rest, oldest first, into a dated file inside `~/.claude/skills/claude-md-tidy/RUNS-archive/` (create the directory if missing) — never delete. `RUNS.md` stays bounded to recent/active records plus anything still provisional or pinned; archived records remain fully readable, just no longer in the always-loaded file.
 

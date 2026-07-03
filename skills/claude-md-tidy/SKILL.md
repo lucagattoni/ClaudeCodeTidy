@@ -1,7 +1,7 @@
 ---
 name: claude-md-tidy
 description: Scan every CLAUDE.md in the current repo against the global "CLAUDE.md hygiene" rules and slim it by relocating/compressing content — never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md.
-version: 0.6.0
+version: 0.7.0
 ---
 
 # /claude-md-tidy
@@ -14,7 +14,7 @@ Optional path to a specific CLAUDE.md, and/or `--report` to run report mode (bel
 
 ## Report mode (`--report`)
 
-A cheap, no-plan, no-confirmation, no-edits pre-check for "how bad is this CLAUDE.md right now?" — skips Step 2's survey and Step 2b's four-test interrogation entirely. Runs Step 0 (Preflight) as normal, then reports two clearly-separated tiers of output and stops:
+A cheap, no-plan, no-confirmation, no-edits pre-check for "how bad is this CLAUDE.md right now?" — skips Step 2's survey and Step 2b's five-test interrogation entirely. Runs Step 0 (Preflight) as normal, then reports two clearly-separated tiers of output and stops:
 
 - **Mechanical checks** (scriptable, no judgment): line/token count per file vs. the global hygiene guardrail (~150 lines); non-English/CJK content flagged with an estimated token-overhead cost (non-English content runs roughly 30-50% more tokens per instruction than equivalent English); a session-cost estimate (per-request token cost × an assumed 30-turn session).
 - **A rough verdict-mix impression** from a shallow read only — an approximate KEEP/COMPRESS/RELOCATE/DELETE/CHALLENGE tally. Label this explicitly as unverified judgment in the output, never with the same confidence as the mechanical counts above — verdict classification without Step 2b's real interrogation is a guess, not an analysis.
@@ -33,11 +33,13 @@ A report-only run still appends a Step 7 run record (tag it analyze-only in the 
 
 Read the **"CLAUDE.md hygiene — keep every CLAUDE.md slim"** section of `~/.claude/CLAUDE.md`. Those numbered rules are the single source of truth for this skill — do not work from memory of them. If the section is missing, stop and report.
 
+Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded scope, not just the hygiene section) — needed for Step 2b's **Redundant-by-order?** question, which can't be answered from the hygiene section alone.
+
 ## Step 2 — Build a complete picture of the repo
 
 **Do not analyze a single CLAUDE.md line before this step is done.** Every verdict in Step 3 must be grounded in what the repo *actually* is, not in what the CLAUDE.md claims it is.
 
-1. Find targets: `git ls-files '*CLAUDE.md' 'CLAUDE.md'` plus an untracked-file check; include nested ones. For each, record line count, word count, section list.
+1. Find targets: `git ls-files '*CLAUDE.md' 'CLAUDE.md'` plus an untracked-file check; include nested ones. **Also** glob the filesystem directly for common gitignored personal-override filenames (starting with `CLAUDE.local.md`) — `git ls-files` and a standard untracked-file check both skip gitignored paths, so a personal-override convention would otherwise never surface. List any found explicitly in the Step 4 plan even if the user then chooses to exclude them — that must be a stated choice, not a silent gap. For each target found, record line count, word count, section list.
 2. **Fixed general-orientation pass** (always, regardless of CLAUDE.md size): top-level `README.md`; a listing — not a deep read — of `.claude/commands/` and `.claude/skills/`; `.claude/settings.json`.
 3. **Claim-driven verification**: extract every concrete claim each CLAUDE.md makes — file paths, command names, workflow descriptions, tool/skill references — then verify only those against the repo (targeted file/path lookups, package manifests or CI config only if a claim points there, git history only if a claim makes an assertion about change frequency or ownership). Do not read anything the CLAUDE.md makes no claim about; this is the survey's cost control — it scales with the CLAUDE.md's own length, not the repo's size.
 4. Inventory the possible relocation homes: `.claude/commands/` and `.claude/skills/` (per-task procedures), `docs/` or `plans/` (background/design), `README.md` (human-facing description).
@@ -49,10 +51,11 @@ Walk each CLAUDE.md **line by line** and question whether it makes sense, before
 
 - **True?** Does it match the repo picture — do the files, commands, paths, and behaviors it references exist and work as described?
 - **Live?** Is it still needed, or does it govern a workflow/file that no longer exists or was superseded?
-- **Consistent?** Does it contradict another rule in this file, a nested CLAUDE.md, a skill, or the repo's observable conventions?
+- **Consistent?** Does it contradict another rule in this file, a nested CLAUDE.md, a skill, or the repo's observable conventions? Actively probe for common contradiction **shapes**, not just whatever a line-by-line read happens to surface: autonomy vs. ask-first, a stated default vs. an exception elsewhere, two rules naming different values for the same threshold/setting, "always X" vs. a documented case where the repo does not-X.
 - **Actionable?** Is it unambiguous enough that two sessions would follow it the same way?
+- **Redundant-by-order?** Does a global-scope file (or any other earlier-loaded rule, per Claude Code's config load order: global CLAUDE.md → global rules → project CLAUDE.md → project rules → Memory) already establish this same intent, making this line pure repetition regardless of exact wording?
 
-A line that fails any of these is **suspect** — never silently fix, keep, or drop it; route it to the CHALLENGE verdict below.
+A line that fails True / Live / Consistent / Actionable is **suspect** — never silently fix, keep, or drop it; route it to the CHALLENGE verdict below. A line that fails only **Redundant-by-order** is not suspect in the same sense (it isn't wrong, just repeated) — it routes to COMPRESS or CHALLENGE per the Step 3 verdict table, never straight to DELETE.
 
 ## Step 3 — Analyze
 
@@ -61,10 +64,10 @@ Walk each CLAUDE.md section by section and classify every block with exactly one
 | Verdict | Meaning | Test |
 |---|---|---|
 | **KEEP** | Behavior-changing rule, already terse | Passes the behavior test and all Step 2b questions as-is |
-| **COMPRESS** | Rule stays here, rewritten tighter | Same meaning expressible in fewer lines (prose → bullets/table, redundant examples dropped) |
-| **RELOCATE** | Detail moves to its proper home; a one-line pointer stays | Procedure/step detail whose natural owner is a skill, `docs/`, or README |
+| **COMPRESS** | Rule stays here, rewritten tighter | Same meaning expressible in fewer lines (prose → bullets/table, redundant examples dropped), **or** fails only **Redundant-by-order** and trimming to a one-line acknowledgment of the earlier-loaded rule preserves genuine project-specific nuance |
+| **RELOCATE** | Detail moves to its proper home; a **rich-abstract pointer** stays — a short synopsis stating the concrete fact(s) a reader would otherwise need to open the sub-doc for (the specific convention, threshold, or command, not just that a sub-doc exists), plus the link | Procedure/step detail whose natural owner is a skill, `docs/`, or README |
 | **DELETE** | Removed outright | Duplicated verbatim elsewhere (cite location), **or** dead and grep-*confirmed* gone (cite the failed lookup — a rename counts as confirmed if the new location is found and cited instead) |
-| **CHALLENGE** | Suspect — raised to the user as a question, never resolved unilaterally | Failed a Step 2b question but **not** grep-confirmable either way: ambiguous liveness, possible-but-unconfirmed rename, contradiction between rules, or wording too vague to act on — **or** an otherwise-RELOCATE-eligible block blocked by an unresolved Step 0 encryption/CI-dependency flag (see Rules of evidence below) |
+| **CHALLENGE** | Suspect — raised to the user as a question, never resolved unilaterally | Failed a Step 2b question but **not** grep-confirmable either way: ambiguous liveness, possible-but-unconfirmed rename, contradiction between rules, or wording too vague to act on; **or** fails only Redundant-by-order with no confirmed project-specific nuance (cite the earlier-loaded rule; the user decides compress-further vs. delete — never route this straight to DELETE, which requires a verbatim duplicate or grep-confirmed dead reference, neither of which a same-intent-different-wording match is) — **or** an otherwise-RELOCATE-eligible block blocked by an unresolved Step 0 encryption/CI-dependency flag (see Rules of evidence below) |
 
 DELETE and CHALLENGE are mutually exclusive by evidence strength, not by which Step 2b question failed: a **confirmed** dead reference is DELETE; anything the grep can't settle is CHALLENGE. If a search is inconclusive, default to CHALLENGE — never guess a DELETE.
 
@@ -79,7 +82,7 @@ Rules of evidence:
 Present a plan per file:
 - Before/after estimated line counts.
 - A table of blocks: section → verdict → destination (for RELOCATE) → evidence (for DELETE).
-- **CHALLENGE items first**, each as a concrete question: the line, what it claims, what the repo picture shows instead (or which rule it contradicts), and the options (fix to match reality / keep — I'm missing context / delete). The user's answer decides the block's final verdict.
+- **CHALLENGE items first, grouped by stakes** — not a flat undifferentiated list: (1) rules gating destructive or safety-relevant behavior (git operations, deploy, secrets) first, (2) rules three or more other lines depend on or reference next, (3) everything else batched last as "minor CHALLENGEs" the user can wave through as a block rather than one by one. Within each group, each item as a concrete question: the line, what it claims, what the repo picture shows instead (or which rule it contradicts), and the options (fix to match reality / keep — I'm missing context / delete). The user's answer decides the block's final verdict.
 - Anything else you were unsure how to classify, flagged as a question.
 
 **Stop and wait for the user's confirmation before touching any file.** The user may approve all, approve partially, or amend verdicts.
@@ -87,7 +90,7 @@ Present a plan per file:
 ## Step 5 — Apply (only after confirmation)
 
 1. **Branching:** follow the repo's own conventions if its CLAUDE.md defines any (branch/worktree rules); otherwise, multi-file changes go on a branch, a single-file compress-only edit may go direct.
-2. Execute RELOCATEs first (create/extend destination files, add cross-links both ways) — skip any still blocked by an unresolved Step 0 encryption or CI-dependency flag — then COMPRESS, then DELETE, then update the CLAUDE.md pointers.
+2. Execute RELOCATEs first (create/extend destination files, add cross-links both ways, and write the rich-abstract pointer — not a bare "see docs/x.md" link — at the original location) — skip any still blocked by an unresolved Step 0 encryption or CI-dependency flag — then COMPRESS, then DELETE, then update the CLAUDE.md pointers.
 3. **Keep docs in sync:** grep for every moved/renamed term and update all referencing docs in the same change.
 4. **No-loss check:** for each removed line, confirm it is either present at its new home or listed in the plan as a verified DELETE. Re-read the final CLAUDE.md top to bottom for coherence.
 5. Commit with a message summarizing before/after line counts; merge/publish per the repo's conventions. Update the repo's CHANGELOG if it keeps one.
