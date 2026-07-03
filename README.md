@@ -1,6 +1,6 @@
 # TidyClaudeMD
 
-**Version 0.8.1** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that keep every repo's `CLAUDE.md` slim without losing information — and that improve themselves from the experience of real runs.
+**Version 0.9.0** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that keep every repo's `CLAUDE.md` slim without losing information — and that improve themselves from the experience of real runs.
 
 Distributed as a single Claude Code plugin, `tidyclaudemd`, bundling both skills. This repo is the plugin **and** its own marketplace — no separate repo to publish to.
 
@@ -11,7 +11,7 @@ Distributed as a single Claude Code plugin, `tidyclaudemd`, bundling both skills
 
 ## Install
 
-**Prerequisite** — `/tidyclaudemd:claudemd-tidy` reads its rules from a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in your **global** `~/.claude/CLAUDE.md`, regardless of install method (this predates the plugin and isn't installed *by* it — see invariant 5 below, "hygiene rules live only in `~/.claude/CLAUDE.md`"). If that section doesn't exist yet, Step 1 stops and reports rather than guessing at rules. This repo deliberately carries no copy of that section (same invariant), so there's no bundled template to point to — write your own numbered rules under that exact heading, covering what makes a CLAUDE.md line worth keeping.
+`/tidyclaudemd:claudemd-tidy` reads its rules from a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in your **global** `~/.claude/CLAUDE.md`. **If that section doesn't exist yet, Step 1 bootstraps it automatically** the first time you run the skill: it appends [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to your global `CLAUDE.md` and tells you it did so. This is a one-time seed, not an ongoing copy — from that point on your global `CLAUDE.md` is the only file ever read or edited; the bundled template is never consulted again.
 
 ```
 /plugin marketplace add lucagattoni/TidyClaudeMD
@@ -31,6 +31,7 @@ TidyClaudeMD/
   README.md                          ← this file
   CHANGELOG.md                       ← version history of the suite (semver)
   LICENSE                            ← MIT
+  HYGIENE-RULES-TEMPLATE.md          ← one-time bootstrap seed for ~/.claude/CLAUDE.md (see Install)
   .claude-plugin/
     plugin.json                      ← plugin manifest (name, version, license, ...)
     marketplace.json                 ← marketplace catalog (this repo lists itself)
@@ -51,7 +52,7 @@ ${CLAUDE_PLUGIN_DATA}/
 
 ## /tidyclaudemd:claudemd-tidy — features
 
-- **Rule sourcing.** The skill carries no rules of its own: it reads the numbered rules from the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md` at runtime. Editing that section changes the skill's behavior; if the section is missing, the skill stops.
+- **Rule sourcing.** The skill carries no rules of its own: it reads the numbered rules from the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md` at runtime. Editing that section changes the skill's behavior; if the section is missing, the skill bootstraps it from the bundled template (see Install) rather than stopping.
 - **Scope.** Optional argument targets one CLAUDE.md; by default it sweeps every CLAUDE.md in the repo, root and nested — including gitignored personal-override files (e.g. `CLAUDE.local.md`-style conventions), which a plain `git ls-files`/untracked-file check would otherwise miss entirely.
 - **Report mode (`--report`).** A cheap, no-plan, no-edits pre-check: mechanical line/token counts vs. the hygiene guardrail, non-English token-overhead flags, a session-cost estimate, and a shallow verdict-mix impression explicitly labeled as unverified judgment. Skips the survey and line interrogation entirely — not a substitute for a full tidy, but still logs a Step 7 run record.
 - **Preflight.** Verifies it's in a git repo, syncs (`git fetch`, branch/dirty/ahead-behind check), and checks repo visibility — public or unknown visibility activates the global PRIMARY CHECK for everything the skill writes. Also checks for encryption (git-crypt/SOPS/age) and CI scripts that depend on `CLAUDE.md`'s content — either flag routes the affected block to CHALLENGE instead of RELOCATE until the flag is resolved.
@@ -86,7 +87,7 @@ Self-improvement may not remove or weaken these; any lesson touching them requir
 2. **No-loss guarantee** — slimming relocates content; information is never lost.
 3. **Evidence before DELETE** — every deletion cites a located duplicate or a verified-gone reference.
 4. **PRIMARY CHECK** — public/unknown-visibility repos get the sensitive-content gate on every written file.
-5. **Single-sourced rules** — the hygiene rules live only in `~/.claude/CLAUDE.md`; the skills never carry a private copy.
+5. **Single-sourced rules at runtime** — every tidy run reads the hygiene rules only from `~/.claude/CLAUDE.md`; the skill never reads its own copy once installed. (The plugin does bundle a one-time bootstrap template, `HYGIENE-RULES-TEMPLATE.md`, used only to seed a fresh `~/.claude/CLAUDE.md` if the section is missing — after that first install, only the global file is ever read or edited. User decision, 2026-07-03.)
 6. **No evidence, no change** — the reflect skill never improvises improvements.
 
 ## Optional companion hook

@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy
 description: Scan every CLAUDE.md in the current repo against the global "CLAUDE.md hygiene" rules and slim it by relocating/compressing content — never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md.
-version: 0.8.1
+version: 0.9.0
 ---
 
 # /tidyclaudemd:claudemd-tidy
@@ -31,7 +31,9 @@ A report-only run still appends a Step 7 run record (tag it analyze-only in the 
 
 ## Step 1 — Load the rules
 
-Read the **"CLAUDE.md hygiene — keep every CLAUDE.md slim"** section of `~/.claude/CLAUDE.md`. Those numbered rules are the single source of truth for this skill — do not work from memory of them. If the section is missing, stop and report.
+Read the **"CLAUDE.md hygiene — keep every CLAUDE.md slim"** section of `~/.claude/CLAUDE.md`. Those numbered rules are the single source of truth for this skill — do not work from memory of them.
+
+**If the section is missing** (first-time setup): append the contents of `${CLAUDE_PLUGIN_ROOT}/HYGIENE-RULES-TEMPLATE.md` verbatim to the end of `~/.claude/CLAUDE.md` as a new section — do not overwrite or reorder anything already in that file. Tell the user you did this and why. This is a **one-time bootstrap**: from this point on, `~/.claude/CLAUDE.md` is the sole source of truth, exactly as if the section had always been there — this skill never reads the bundled template again after the first install, and the reflect skill only ever proposes edits to the global file, never to the template.
 
 Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded scope, not just the hygiene section) — needed for Step 2b's **Redundant-by-order?** question, which can't be answered from the hygiene section alone.
 

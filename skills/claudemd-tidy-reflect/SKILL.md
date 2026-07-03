@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy-reflect
 description: Self-improvement loop for TidyClaudeMD. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on claudemd-tidy.
-version: 0.8.1
+version: 0.9.0
 ---
 
 # /tidyclaudemd:claudemd-tidy-reflect
@@ -51,7 +51,7 @@ Each candidate lesson must pass all three tests, or be discarded (and reported a
 
 ## Step 4 — Invariant gate
 
-These invariants (documented in `README.md` → Invariants) may **never be weakened or removed autonomously**: the Step-4 stop-and-confirm, the no-loss guarantee, evidence-before-DELETE, the public-repo PRIMARY CHECK, hygiene rules single-sourced in the global CLAUDE.md, and no-evidence-no-change (this skill's own). A lesson that would touch one of them is presented to the user with pros/cons and applied only on their explicit approval. Everything else may be applied autonomously.
+These invariants (documented in `README.md` → Invariants) may **never be weakened or removed autonomously**: the Step-4 stop-and-confirm, the no-loss guarantee, evidence-before-DELETE, the public-repo PRIMARY CHECK, hygiene rules single-sourced at runtime in the global CLAUDE.md (the plugin's one-time bootstrap template is not an exception — see README invariant 5), and no-evidence-no-change (this skill's own). A lesson that would touch one of them is presented to the user with pros/cons and applied only on their explicit approval. Everything else may be applied autonomously.
 
 ## Step 5 — Apply
 

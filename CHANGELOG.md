@@ -4,6 +4,17 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-07-03
+
+### Added
+- `HYGIENE-RULES-TEMPLATE.md`: the plugin now bundles a static seed template of the `## CLAUDE.md hygiene` section. `claudemd-tidy` Step 1 bootstraps it automatically into `~/.claude/CLAUDE.md` the first time the section is found missing, instead of stopping and reporting — resolves the gap documented in v0.8.1 all the way to "just works" instead of "clearly explained but still manual" (user request, 2026-07-03).
+
+### Changed
+- Invariant 5 reworded from "the skills never carry a private copy" to "single-sourced at runtime" — the plugin does now carry a one-time bootstrap copy by design; the invariant that matters (no *ongoing* parallel copy read at runtime, no drift from the global file after first install) is unchanged. Touches a protected invariant; applied only after presenting the tradeoff and getting explicit approval (two decisions: static-seed vs. auto-synced template, and skill-level bootstrap vs. a `SessionStart` hook — user chose static seed + skill-level check both times, 2026-07-03).
+
+### Known limitation
+- The bootstrap path itself (Step 1 appending the template when the section is missing) is **not independently tested** — safely sandboxing a test requires either overriding `HOME` (which breaks Claude Code auth) or selectively copying credential files into a fake home (correctly blocked by this environment's own safety classifier as credential exploration). The logic is simple, unambiguous prompt instruction using the same Write/Edit mechanism already validated working in the v0.8.0 `--report`-mode test (which successfully located and attempted a write to `${CLAUDE_PLUGIN_DATA}/RUNS.md`), but the specific append-if-missing behavior has not been run end to end.
+
 ## [0.8.1] — 2026-07-03
 
 ### Added
