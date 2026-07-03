@@ -4,6 +4,14 @@ All notable changes to the suite (`claude-md-tidy` + `claude-md-tidy-reflect`). 
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-07-03
+
+### Added
+- Report mode (`--report`): a cheap, no-plan, no-edits pre-check — mechanical line/token counts vs. the hygiene guardrail, non-English/CJK token-overhead flags, a session-cost estimate, plus a shallow verdict-mix impression explicitly labeled as unverified judgment. Skips the survey and line interrogation entirely; still logs a Step 7 run record (competitive landscape review, 2026-07-03; `plans/v1.3.0-integrated-candidate-improvements.md` item 7).
+
+### Changed
+- Repo survey (Step 2) is now **claim-driven** instead of an unbounded full-repo read: a fixed cheap orientation pass (README, commands/skills listing, settings.json) plus targeted verification of only the concrete claims each CLAUDE.md actually makes. The comprehension gate's "if you can't, keep reading" is redefined as "keep resolving unverified claims" — cost now scales with the CLAUDE.md's own length, not the repo's size (competitive landscape review, 2026-07-03; item 2).
+
 ## [0.4.0] — 2026-07-03
 
 ### Added

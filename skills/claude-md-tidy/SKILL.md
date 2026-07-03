@@ -1,7 +1,7 @@
 ---
 name: claude-md-tidy
 description: Scan every CLAUDE.md in the current repo against the global "CLAUDE.md hygiene" rules and slim it by relocating/compressing content — never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md.
-version: 0.4.0
+version: 0.5.0
 ---
 
 # /claude-md-tidy
@@ -10,7 +10,16 @@ Audit and slim the CLAUDE.md file(s) of the current repo. Two phases: **analyze 
 
 ## Argument
 
-Optional path to a specific CLAUDE.md. If omitted, process every CLAUDE.md in the current repo (root + nested).
+Optional path to a specific CLAUDE.md, and/or `--report` to run report mode (below) instead of a full tidy. If no path is given, process every CLAUDE.md in the current repo (root + nested).
+
+## Report mode (`--report`)
+
+A cheap, no-plan, no-confirmation, no-edits pre-check for "how bad is this CLAUDE.md right now?" — skips Step 2's survey and Step 2b's four-test interrogation entirely. Runs Step 0 (Preflight) as normal, then reports two clearly-separated tiers of output and stops:
+
+- **Mechanical checks** (scriptable, no judgment): line/token count per file vs. the global hygiene guardrail (~150 lines); non-English/CJK content flagged with an estimated token-overhead cost (non-English content runs roughly 30-50% more tokens per instruction than equivalent English); a session-cost estimate (per-request token cost × an assumed 30-turn session).
+- **A rough verdict-mix impression** from a shallow read only — an approximate KEEP/COMPRESS/RELOCATE/DELETE/CHALLENGE tally. Label this explicitly as unverified judgment in the output, never with the same confidence as the mechanical counts above — verdict classification without Step 2b's real interrogation is a guess, not an analysis.
+
+A report-only run still appends a Step 7 run record (tag it analyze-only in the Result field) and explicitly states in its output that it is a heuristic pre-check, not a substitute for a full tidy.
 
 ## Step 0 — Preflight
 
@@ -27,9 +36,10 @@ Read the **"CLAUDE.md hygiene — keep every CLAUDE.md slim"** section of `~/.cl
 **Do not analyze a single CLAUDE.md line before this step is done.** Every verdict in Step 3 must be grounded in what the repo *actually* is, not in what the CLAUDE.md claims it is.
 
 1. Find targets: `git ls-files '*CLAUDE.md' 'CLAUDE.md'` plus an untracked-file check; include nested ones. For each, record line count, word count, section list.
-2. Survey the repo: full file tree; `README.md` and everything under `docs/`; every skill/command in `.claude/commands/` and `.claude/skills/`; `.claude/settings.json` (hooks, permissions); package manifests and build/CI config; recent git history (what actually changes, and who — humans, scheduled agents, CI).
-3. Inventory the possible relocation homes: `.claude/commands/` and `.claude/skills/` (per-task procedures), `docs/` or `plans/` (background/design), `README.md` (human-facing description).
-4. **Comprehension gate** — before moving on, you must be able to answer: what does this repo do; how is it built/run/deployed; which agents, hooks, and scheduled processes operate on it; which conventions demonstrably hold in the tree (naming, layout, workflows) and which appear only in the CLAUDE.md. If you can't, keep reading.
+2. **Fixed general-orientation pass** (always, regardless of CLAUDE.md size): top-level `README.md`; a listing — not a deep read — of `.claude/commands/` and `.claude/skills/`; `.claude/settings.json`.
+3. **Claim-driven verification**: extract every concrete claim each CLAUDE.md makes — file paths, command names, workflow descriptions, tool/skill references — then verify only those against the repo (targeted file/path lookups, package manifests or CI config only if a claim points there, git history only if a claim makes an assertion about change frequency or ownership). Do not read anything the CLAUDE.md makes no claim about; this is the survey's cost control — it scales with the CLAUDE.md's own length, not the repo's size.
+4. Inventory the possible relocation homes: `.claude/commands/` and `.claude/skills/` (per-task procedures), `docs/` or `plans/` (background/design), `README.md` (human-facing description).
+5. **Comprehension gate** — before moving on, you must be able to answer: what does this repo do; how is it built/run/deployed; which agents, hooks, and scheduled processes operate on it; which conventions demonstrably hold in the tree (naming, layout, workflows) and which appear only in the CLAUDE.md. If you can't, **keep resolving unverified claims** from bullet 3 — never expand into an open-ended survey.
 
 ## Step 2b — Critically interrogate every line
 
@@ -83,7 +93,7 @@ Present a plan per file:
 
 Final summary: per file, before → after line counts, blocks relocated (with destinations), blocks deleted (with evidence), and any open questions the user deferred.
 
-## Step 7 — Record the run (always, even for analyze-only runs)
+## Step 7 — Record the run (always, even for analyze-only or report-only runs)
 
 Append a run record at the **top** of `~/.claude/skills/claude-md-tidy/RUNS.md` (create the file with a `# claude-md-tidy — run records` header if missing):
 
