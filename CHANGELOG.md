@@ -4,6 +4,14 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.17.0] — 2026-07-08
+
+### Added
+- Run records (tidy Step 7) gain **Target classes** and **Memory snapshot** fields; the reflect skill's pruning signal now scopes evidence per class — a class-specific instruction can only be judged inert from runs that actually covered that class (mission plan Phase 4; user directive 2026-07-08).
+
+### Changed
+- README and plugin manifest reframed around the full mission: the suite maintains the whole Claude Code instruction surface (project/user CLAUDE.md, rules, skills, memory), not only repo CLAUDE.md files.
+
 ## [0.16.0] — 2026-07-08
 
 ### Added

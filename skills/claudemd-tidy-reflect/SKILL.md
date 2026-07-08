@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy-reflect
 description: Self-improvement loop for TidyClaudeMD. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on claudemd-tidy.
-version: 0.16.0
+version: 0.17.0
 ---
 
 # /tidyclaudemd:claudemd-tidy-reflect
@@ -35,7 +35,7 @@ Mine the evidence for signals, strongest first:
 3. **The skill had to ask a question** the instructions should have answered → a gap to close.
 4. **Apply-phase friction or error** (blocked command, missing destination, sync conflict) → a preflight or apply step to harden.
 5. **Content that fit no verdict or no destination** → the taxonomy needs extending.
-6. **An existing instruction in `claudemd-tidy/SKILL.md` never triggered across the processed run records** — never cited as the reason a CHALLENGE/DELETE/RELOCATE fired, never referenced in feedback — is a **pruning candidate**. Requires the same evidence discipline as an addition: cite which records were checked and found the instruction inert before proposing its removal in Step 5.
+6. **An existing instruction in `claudemd-tidy/SKILL.md` never triggered across the processed run records** — never cited as the reason a CHALLENGE/DELETE/RELOCATE fired, never referenced in feedback — is a **pruning candidate**. Requires the same evidence discipline as an addition: cite which records were checked and found the instruction inert before proposing its removal in Step 5. For a class-specific instruction (skills/memory/user-level tests), only runs whose **Target classes** field covers that class count as evidence either way — a memory test can't be judged inert from CLAUDE.md-only runs.
 
 Each candidate lesson must pass all three tests, or be discarded (and reported as discarded, with the reason):
 - **Generalizable** — would improve tidy runs in *other* repos, not just this one.

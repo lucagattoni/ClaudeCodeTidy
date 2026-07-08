@@ -1,12 +1,12 @@
 # TidyClaudeMD
 
-**Version 0.16.0** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that keep every repo's `CLAUDE.md` slim without losing information — and that improve themselves from the experience of real runs.
+**Version 0.17.0** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that maintain your whole Claude Code instruction surface — project and user-level CLAUDE.md, `.claude/rules/`, SKILL.md files, and auto memory — keeping every file slim without losing information, and improving themselves from the experience of real runs.
 
 Distributed as a single Claude Code plugin, `tidyclaudemd`, bundling both skills. This repo is the plugin **and** its own marketplace — no separate repo to publish to.
 
 | Skill | Purpose |
 |---|---|
-| [`/tidyclaudemd:claudemd-tidy`](skills/claudemd-tidy/SKILL.md) | Audit and slim the CLAUDE.md file(s) of the current repo |
+| [`/tidyclaudemd:claudemd-tidy`](skills/claudemd-tidy/SKILL.md) | Audit and slim Claude Code instruction files: project/user CLAUDE.md (default), rules, skills (`--skills`), memory (`--memory`) |
 | [`/tidyclaudemd:claudemd-tidy-reflect`](skills/claudemd-tidy-reflect/SKILL.md) | Learn from recorded runs and meta-improve the suite itself |
 
 ## Install
@@ -67,7 +67,7 @@ ${CLAUDE_PLUGIN_DATA}/
 - **Stop point.** The full plan (CHALLENGE questions **grouped by stakes** — destructive/safety-relevant first, then widely-depended-on rules, then everything else batched as minor CHALLENGEs — then the verdict table, destinations, evidence, before/after line estimates) is presented and **nothing is edited until the user confirms**. Partial approval and amended verdicts are supported.
 - **Apply discipline.** Follows the target repo's own branching conventions; relocates first (with two-way cross-links), then compresses, then deletes; greps for every moved term and updates all referencing docs in the same change; updates the repo's CHANGELOG if it keeps one.
 - **No-loss check.** After applying, every removed line must be found at its new home or on the verified-DELETE list; the final CLAUDE.md is re-read end-to-end for coherence.
-- **Run recording with generalizability tags.** Every run — even analyze-only — appends a structured record to `RUNS.md`: result, which instructions were exercised (which step/test produced each non-KEEP verdict and each CHALLENGE), user feedback, questions asked, friction, uncovered cases. Each piece of user feedback (amendments, CHALLENGE resolutions, remarks) is tagged **at recording time, while context is fresh**: `[general → suggested home]` if the lesson would hold in other repos, `[repo-specific]` if not, `[general?]` when unsure. These records are the training data for the reflection loop.
+- **Run recording with generalizability tags.** Every run — even analyze-only — appends a structured record to `RUNS.md`: target classes covered (so reflection can judge class-specific tests fairly), memory snapshot path when one was taken, result, which instructions were exercised (which step/test produced each non-KEEP verdict and each CHALLENGE), user feedback, questions asked, friction, uncovered cases. Each piece of user feedback (amendments, CHALLENGE resolutions, remarks) is tagged **at recording time, while context is fresh**: `[general → suggested home]` if the lesson would hold in other repos, `[repo-specific]` if not, `[general?]` when unsure. These records are the training data for the reflection loop.
 
 ## /tidyclaudemd:claudemd-tidy-reflect — features
 

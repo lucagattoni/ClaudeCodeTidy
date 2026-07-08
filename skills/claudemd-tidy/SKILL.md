@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 0.16.0
+version: 0.17.0
 ---
 
 # /tidyclaudemd:claudemd-tidy
@@ -146,6 +146,9 @@ Append a run record at the **top** of `${CLAUDE_PLUGIN_DATA}/RUNS.md` (create th
 ```markdown
 ## YYYY-MM-DD — <repo> (<files processed>)
 - **Processed:** no
+- **Target classes:** <which classes this run covered: project / user-level / skills / memory — lets reflection compare instruction performance per class>
+- **Memory snapshot:** <path, if a memory edit happened — or "n/a">
+
 - **Result:** <before> → <after> lines · <n> relocated · <n> compressed · <n> deleted · <n> challenged (or "analyze-only, not applied")
 - **Instructions exercised:** <for each non-KEEP verdict and each CHALLENGE, the SKILL.md step or test that produced it (e.g. "RELOCATE: Step 3 verdict table", "CHALLENGE: Step 2b Consistent?") — or "none (analyze-only found nothing to act on)". This is what lets `/tidyclaudemd:claudemd-tidy-reflect` later tell which instructions are pulling weight across runs and which never fire.>
 - **User feedback:** <every amendment, CHALLENGE resolution, and remark the user made, verbatim-ish, each tagged:
