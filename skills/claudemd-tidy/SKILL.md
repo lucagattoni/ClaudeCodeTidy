@@ -1,12 +1,12 @@
 ---
 name: claudemd-tidy
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 0.17.1
+version: 0.18.0
 ---
 
 # /tidyclaudemd:claudemd-tidy
 
-Audit and slim Claude Code instruction files — project CLAUDE.md by default; user-level files, skills, and memory via the class flags below. Two phases: **analyze & propose** (always), then **apply** (only after the user confirms).
+Audit and slim Claude Code instruction files — project CLAUDE.md by default; user-level files, skills, and memory via the class flags below. Two phases: **analyze & propose** (always), then **apply** — autonomously for reversibility-protected targets, after confirmation for everything else (the gate in Step 4).
 
 ## Argument
 
@@ -104,6 +104,8 @@ Walk each CLAUDE.md section by section and classify every block with exactly one
 
 DELETE and CHALLENGE are mutually exclusive by evidence strength, not by which Step 2b question failed: a **confirmed** dead reference is DELETE; anything the grep can't settle is CHALLENGE. If a search is inconclusive, default to CHALLENGE — never guess a DELETE.
 
+**Lean CHALLENGE principle:** CHALLENGE is reserved for genuinely user-only questions — intent, preference, scope ownership. Anything resolvable by evidence (a grep, a doc check, the repo picture, another verification pass) must be resolved autonomously in this step, iterating until settled, never delegated to the user for convenience.
+
 Rules of evidence:
 - Before any **DELETE**, verify: grep the repo for the referenced file/command/term. Cite the evidence (the duplicate's location, or the failed lookup proving it's gone) in the plan.
 - Before any **RELOCATE**, identify the exact destination file and whether it already covers the content (then it's a DELETE-as-duplicate with a pointer check, not a move).
@@ -111,18 +113,22 @@ Rules of evidence:
 - **Duplicates in rules files split by load scope:** a CLAUDE.md line duplicated verbatim in an **unconditional** `.claude/rules/` file is DELETE-eligible (cite it — both copies are always-loaded, removing one changes nothing semantically); duplicated verbatim in a **path-scoped** rule it routes to CHALLENGE instead — deleting the CLAUDE.md copy would narrow always-loaded content to conditional loading, a scope decision only the user can make.
 - A block flagged by Step 0's encryption or CI-dependency check cannot be RELOCATEd until that flag's condition is satisfied (matching encryption scope confirmed, or the user explicitly confirms the CI dependency is handled in Step 4) — until then it routes to CHALLENGE, not RELOCATE.
 
-## Step 4 — Report and confirm (stop point)
+## Step 4 — Report, then apply the reversibility gate
 
-Present a plan per file:
+Present a plan per file (contents below), then route each target through the gate:
+
+- **Autonomous tier** — the target file is git-tracked, or it is memory protected by a Step-taken snapshot: non-CHALLENGE verdicts proceed straight to Step 5, with a commit per iteration so every change is individually revertible. Say so explicitly in the output (which tier, which protection) — autonomy is announced, never silent.
+- **Confirm-first tier** — the target is unversioned and unprotected: **stop and wait for the user's confirmation before touching the file.** The user may approve all, approve partially, or amend verdicts.
+- **Always stop, regardless of tier**: every CHALLENGE (user-only by construction), every out-of-repo write (confirmed individually — named file, exact content), and anything the PRIMARY CHECK flags. A block whose verdict depends on a CHALLENGE answer waits for that answer; independent blocks proceed.
+
+Plan contents per file:
 - Before/after estimated line counts.
 - A table of blocks: section → verdict → destination (for RELOCATE) → evidence (for DELETE).
 - **CHALLENGE items first, grouped by stakes** — not a flat undifferentiated list: (1) rules gating destructive or safety-relevant behavior (git operations, deploy, secrets) first, (2) rules three or more other lines depend on or reference next, (3) everything else batched last as "minor CHALLENGEs" the user can wave through as a block rather than one by one. Within each group, each item as a concrete question: the line, what it claims, what the repo picture shows instead (or which rule it contradicts), and the options (fix to match reality / keep — I'm missing context / delete; a **Correctly-scoped?** item additionally offers: promote to global `~/.claude/CLAUDE.md` / move to `CLAUDE.local.md`; a **Rule-vs-memory?** item additionally offers: belongs in memory — Step 5 defines what each resolution does). The user's answer decides the block's final verdict.
 - **Out-of-repo writes are confirmed individually.** Any resolution that writes outside the repo being tidied (e.g. promote-to-global) is presented on its own — named file, exact content shown — and is never bundled into a bulk "approve all"; only in-repo changes may be bulk-approved.
 - Anything else you were unsure how to classify, flagged as a question.
 
-**Stop and wait for the user's confirmation before touching any file.** The user may approve all, approve partially, or amend verdicts.
-
-## Step 5 — Apply (only after confirmation)
+## Step 5 — Apply (per the Step 4 gate)
 
 1. **Branching:** follow the repo's own conventions if its CLAUDE.md defines any (branch/worktree rules); otherwise, multi-file changes go on a branch, a single-file compress-only edit may go direct.
 2. Execute RELOCATEs first (create/extend destination files, add cross-links both ways, and write the rich-abstract pointer — not a bare "see docs/x.md" link — at the original location) — skip any still blocked by an unresolved Step 0 encryption or CI-dependency flag — then COMPRESS, then DELETE, then update the CLAUDE.md pointers.
@@ -132,8 +138,9 @@ Present a plan per file:
    - *Out-of-repo files* (`@~/...`, external absolute paths): audited, never auto-edited — verdicts surface as individually-confirmed CHALLENGEs per Step 4's out-of-repo rule.
 4. **Scope-resolution destinations:** *promote-to-global* appends the individually-confirmed content to `~/.claude/CLAUDE.md`, exactly as shown at Step 4. *Move-to-`CLAUDE.local.md`* creates the file at the repo root if missing and verifies it is gitignored (extend `.gitignore` in the same change if not). *Belongs-in-memory* writes nothing and removes nothing — the line stays untouched and is reported in Step 6; the user performs the move themselves (the documented manual path), and only a **later** run may DELETE the original, once a targeted grep finds the content verifiably present in `MEMORY.md`/topic files (normal DELETE evidence — the skill never removes a line whose destination it didn't write and can't verify).
 5. **Keep docs in sync:** grep for every moved/renamed term and update all referencing docs in the same change.
-6. **No-loss check:** for each removed line, confirm it is either present at its new home or listed in the plan as a verified DELETE. Re-read the final CLAUDE.md top to bottom for coherence.
-7. Commit with a message summarizing before/after line counts; merge/publish per the repo's conventions. Update the repo's CHANGELOG if it keeps one.
+6. **No-loss check:** for each removed line, confirm it is either present at its new home or listed in the plan as a verified DELETE. Re-read the final file top to bottom for coherence.
+7. **Iterative self-review loop:** after applying, run a fresh adversarial review of the result — hunt for information loss, broken references, degraded wording, contradictions the edits introduced. Fix findings and re-review until a pass finds nothing. Commit each iteration separately — never batch the loop into one commit.
+8. Each iteration ends in its own commit (the first summarizing before/after line counts); merge/publish per the repo's conventions. Update the repo's CHANGELOG if it keeps one.
 
 ## Step 6 — Report
 

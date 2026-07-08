@@ -4,6 +4,15 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.18.0] — 2026-07-08
+
+### Changed
+- **Invariant 1 rewritten** (explicit user approval, 2026-07-08): "stop-and-confirm" becomes the **reversibility gate** — git-tracked targets (and snapshot-protected memory) are edited autonomously with one commit per iteration; unversioned, unprotected files still wait for plan approval; user-only decisions (intent, preference, scope ownership, out-of-repo writes) always stop, regardless of tier. Autonomy is announced in the output, never silent.
+- **Iterative self-review loop** added to the apply phase: after applying, an adversarial review pass hunts for information loss, broken references, and introduced contradictions; fix and re-review until clean, committing each iteration.
+- **Lean CHALLENGE principle** made explicit in Step 3: CHALLENGE is reserved for genuinely user-only questions; anything evidence-resolvable is resolved autonomously, iterating as needed.
+
+**Bump note:** this is a MAJOR workflow-contract change (stop-point semantics) by this suite's own table. Applied as MINOR-numbered 0.18.0 per the standing pre-1.0 precedent (0.8.0, 0.4.0 item 11) and explicit user decision 2026-07-08: 1.0.0 waits for end-to-end marketplace verification and real multi-class run records.
+
 ## [0.17.1] — 2026-07-08
 
 ### Fixed
