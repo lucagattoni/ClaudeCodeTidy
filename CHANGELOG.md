@@ -4,6 +4,11 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.19.1] — 2026-07-08
+
+### Changed
+- Step 2 bullet 4's `.claude/rules/` inventory clause clarified: the "raise a question first" requirement applies only to *introducing* the pattern to a repo that doesn't use it yet; once a `.claude/rules/` directory is found present (Step 2 bullet 2's survey), it's an established RELOCATE destination — no repeat question on later runs. The prior wording only implied this via a negative condition; made explicit after a run flagged the ambiguity as forward-looking risk, though no misfire was actually observed (provisional, 1 occurrence — run: 2026-07-08 job2026 project CLAUDE.md).
+
 ## [0.19.0] — 2026-07-08
 
 ### Added
