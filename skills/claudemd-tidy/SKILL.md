@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 0.18.0
+version: 0.19.0
 ---
 
 # /tidyclaudemd:claudemd-tidy
@@ -14,7 +14,7 @@ Optional: a path to a specific target file, a target-class flag (below), and/or 
 
 ## Target classes
 
-Every class runs the same phases — preflight → rules → survey → interrogate → verdicts → confirm → apply → record — with the class-specific behavior below. For user-level classes, "the repo" in Step 0 is `~/.claude` itself: the versioning check (Step 0.6) decides whether it has git history; there is no CI/encryption surface; PRIMARY CHECK applies if the `~/.claude` repo ever has a remote. For `--memory`, Step 0's git steps don't apply at all — the snapshot rule in the table below is the safety mechanism. `--report` composes with any class flag: the mechanical checks run against that class's files.
+Every class runs the same phases — preflight → rules → survey → interrogate → verdicts → confirm → apply → record — with the class-specific behavior below. For user-level classes, "the repo" in Step 0 is `~/.claude` itself: the versioning check (Step 0.7) decides whether it has git history; there is no CI/encryption surface; PRIMARY CHECK applies if the `~/.claude` repo ever has a remote. For `--memory`, Step 0's git steps don't apply at all — the snapshot rule in the table below is the safety mechanism. `--report` composes with any class flag: the mechanical checks run against that class's files. The AGENTS.md visibility check (Step 2 bullet 1 / report mode) applies to **project-class targets only** — user-level, skills, and memory classes have no AGENTS.md-equivalent surface to check.
 
 | Class | Flag | Locations | Size guidance | Class-specific behavior |
 |---|---|---|---|---|
@@ -34,13 +34,14 @@ A report-only run still appends a Step 7 run record (tag it analyze-only in the 
 
 ## Step 0 — Preflight
 
-1. Confirm you are inside a git repo; if not, ask which file to tidy and skip git steps.
-2. Sync per the global working defaults: `git fetch`, check branch/ahead-behind/dirty state.
-3. Check repo visibility (`gh repo view --json visibility` or inspect the remote). If public or unknown → the **PRIMARY CHECK** in `~/.claude/CLAUDE.md` applies to every file this skill writes, including relocated content.
-4. **Encryption check.** Scan for git-crypt/SOPS filters in `.gitattributes` or an `.age` key reference. If found, flag it: in Step 3, any encryption-unlock instructions in the CLAUDE.md are force-classified **KEEP** (never RELOCATE — moving them risks a chicken-and-egg lock-out); any other RELOCATE destination must be verified as covered by the same encryption scope as the source before Step 5 executes it.
-5. **CI-dependency check.** Scan CI config (`.github/workflows/` and any other CI directories at the repo root) for scripts that reference `CLAUDE.md` — or any file a CLAUDE.md imports — by filename (e.g. a script that greps its content for a required phrase). If found, flag the content those scripts appear to depend on: it's ineligible for RELOCATE in Step 5 without the user's explicit confirmation in Step 4 that the CI dependency is accounted for.
+1. **Version-currency check.** Read `~/.claude/plugins/installed_plugins.json` and find this plugin's pinned version (`plugins["tidyclaudemd@tidyclaudemd"][0].version`). Compare it to this file's own frontmatter `version:`. If they differ, this session is executing stale, cached skill instructions — **stop before Step 1** and tell the user: run `/plugin update tidyclaudemd` if not already done, then **restart the Claude Code session** (`/reload-plugins` mid-session updates the plugin registry but does not swap in new skill content for the running session — confirmed by direct observation, 2026-07-08). If the two versions match, proceed normally.
+2. Confirm you are inside a git repo; if not, ask which file to tidy and skip git steps.
+3. Sync per the global working defaults: `git fetch`, check branch/ahead-behind/dirty state.
+4. Check repo visibility (`gh repo view --json visibility` or inspect the remote). If public or unknown → the **PRIMARY CHECK** in `~/.claude/CLAUDE.md` applies to every file this skill writes, including relocated content.
+5. **Encryption check.** Scan for git-crypt/SOPS filters in `.gitattributes` or an `.age` key reference. If found, flag it: in Step 3, any encryption-unlock instructions in the CLAUDE.md are force-classified **KEEP** (never RELOCATE — moving them risks a chicken-and-egg lock-out); any other RELOCATE destination must be verified as covered by the same encryption scope as the source before Step 5 executes it.
+6. **CI-dependency check.** Scan CI config (`.github/workflows/` and any other CI directories at the repo root) for scripts that reference `CLAUDE.md` — or any file a CLAUDE.md imports — by filename (e.g. a script that greps its content for a required phrase). If found, flag the content those scripts appear to depend on: it's ineligible for RELOCATE in Step 5 without the user's explicit confirmation in Step 4 that the CI dependency is accounted for.
 
-6. **User-level versioning check.** If this run may write anything under `~/.claude` (a promote-to-global resolution is on the table, or a user-level target is in scope): check whether `~/.claude` is a git repository. If it isn't, **propose — never auto-create** — the bootstrap (repo-initialization in the home directory is a user-only decision): `git init` plus this allowlist `.gitignore`, shown to the user in full since it is the safety mechanism:
+7. **User-level versioning check.** If this run may write anything under `~/.claude` (a promote-to-global resolution is on the table, or a user-level target is in scope): check whether `~/.claude` is a git repository. If it isn't, **propose — never auto-create** — the bootstrap (repo-initialization in the home directory is a user-only decision): `git init` plus this allowlist `.gitignore`, shown to the user in full since it is the safety mechanism:
 
    ```gitignore
    *

@@ -4,6 +4,14 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.19.0] — 2026-07-08
+
+### Added
+- **Version-currency check** (Step 0, new leading preflight item): compares the running session's loaded `version:` frontmatter against `~/.claude/plugins/installed_plugins.json`'s pinned version; on mismatch, stops before Step 1 and tells the user to restart the session — `/reload-plugins` alone does not swap in new skill content mid-session, confirmed by two independent invocation attempts observing the identical symptom, the second occurring *after* the user had already run `/plugin update` + `/reload-plugins` (run: 2026-07-08 user-level `--report --user`; run: 2026-07-08 user-level `--user` blocked-not-run). Existing Step 0 items renumbered 2–7.
+
+### Changed
+- AGENTS.md visibility check scoped explicitly to project-class targets in the Target classes intro and report mode — user-level, skills, and memory classes have no AGENTS.md-equivalent surface (provisional, 1 occurrence — run: 2026-07-08 user-level `--report --user`).
+
 ## [0.18.0] — 2026-07-08
 
 ### Changed
