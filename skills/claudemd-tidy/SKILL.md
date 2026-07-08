@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 0.19.1
+version: 0.19.2
 ---
 
 # /tidyclaudemd:claudemd-tidy
@@ -131,7 +131,7 @@ Plan contents per file:
 
 ## Step 5 — Apply (per the Step 4 gate)
 
-1. **Branching:** follow the repo's own conventions if its CLAUDE.md defines any (branch/worktree rules); otherwise, multi-file changes go on a branch, a single-file compress-only edit may go direct.
+1. **Branching:** immediately before the first commit, explicitly re-check whether the target's own CLAUDE.md defines branch/worktree conventions — do this even for a trivial single-line edit ("it's small" is not an exemption) and even when the file being committed is the CLAUDE.md that defines those conventions (a self-referential edit does not exempt itself from its own rule). If conventions are defined, follow them in full. Only once confirmed the repo defines none does the size-based fallback apply: multi-file changes go on a branch, a single-file compress-only edit may go direct.
 2. Execute RELOCATEs first (create/extend destination files, add cross-links both ways, and write the rich-abstract pointer — not a bare "see docs/x.md" link — at the original location) — skip any still blocked by an unresolved Step 0 encryption or CI-dependency flag — then COMPRESS, then DELETE, then update the CLAUDE.md pointers.
 3. **Imported-file edit policy** — verdicts can land on imported blocks (Step 2b), but where the edit goes depends on what the imported file is:
    - *In-repo instruction files* (an imported `AGENTS.md`, `docs/git-instructions.md`, or similar file existing to instruct AI tools): edit the imported file directly; never duplicate imported content back into the CLAUDE.md. Step 0's flags extend here — the encryption same-scope verification applies to any imported file edited, and the CI-dependency grep must include imported filenames.

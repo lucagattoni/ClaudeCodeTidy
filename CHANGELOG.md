@@ -4,6 +4,11 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.19.2] — 2026-07-09
+
+### Changed
+- Step 5.1's branching clause now requires an explicit re-check of the target's own branch/worktree conventions **immediately before the first commit** — not assumed satisfied because the edit is small or single-file, and applying in full even when the file being committed is itself the source of those conventions (the self-referential case: tidying a CLAUDE.md that itself mandates worktree+PR workflow). Previously the clause's "otherwise" fallback ("a single-file compress-only edit may go direct") was easy to reach without first confirming the repo actually defines no conventions — a live run skipped the check entirely and committed a CLAUDE.md edit straight to the primary checkout's `main`, violating that repo's own documented worktree rule (provisional, 1 occurrence — run: 2026-07-08 Claude-Loops project CLAUDE.md).
+
 ## [0.19.1] — 2026-07-08
 
 ### Changed
