@@ -4,6 +4,11 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.17.1] — 2026-07-08
+
+### Fixed
+- Adversarial-review corrections from the phase executions: the tidy skill's intro line still described "the CLAUDE.md file(s) of the current repo" (stale after target classes); `--report` × class-flag composition was unspecified (now: mechanical checks run against the selected class); Step 0's git steps are now explicitly disclaimed for `--memory` (the snapshot is the safety mechanism there); plugin description grammar (self-review of phases 1–4, 2026-07-08).
+
 ## [0.17.0] — 2026-07-08
 
 ### Added

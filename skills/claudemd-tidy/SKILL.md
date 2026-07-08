@@ -1,12 +1,12 @@
 ---
 name: claudemd-tidy
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 0.17.0
+version: 0.17.1
 ---
 
 # /tidyclaudemd:claudemd-tidy
 
-Audit and slim the CLAUDE.md file(s) of the current repo. Two phases: **analyze & propose** (always), then **apply** (only after the user confirms).
+Audit and slim Claude Code instruction files — project CLAUDE.md by default; user-level files, skills, and memory via the class flags below. Two phases: **analyze & propose** (always), then **apply** (only after the user confirms).
 
 ## Argument
 
@@ -14,7 +14,7 @@ Optional: a path to a specific target file, a target-class flag (below), and/or 
 
 ## Target classes
 
-Every class runs the same phases — preflight → rules → survey → interrogate → verdicts → confirm → apply → record — with the class-specific behavior below. For user-level classes, "the repo" in Step 0 is `~/.claude` itself: the versioning check (Step 0.6) decides whether it has git history; there is no CI/encryption surface; PRIMARY CHECK applies if the `~/.claude` repo ever has a remote.
+Every class runs the same phases — preflight → rules → survey → interrogate → verdicts → confirm → apply → record — with the class-specific behavior below. For user-level classes, "the repo" in Step 0 is `~/.claude` itself: the versioning check (Step 0.6) decides whether it has git history; there is no CI/encryption surface; PRIMARY CHECK applies if the `~/.claude` repo ever has a remote. For `--memory`, Step 0's git steps don't apply at all — the snapshot rule in the table below is the safety mechanism. `--report` composes with any class flag: the mechanical checks run against that class's files.
 
 | Class | Flag | Locations | Size guidance | Class-specific behavior |
 |---|---|---|---|---|

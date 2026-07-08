@@ -1,6 +1,6 @@
 # TidyClaudeMD
 
-**Version 0.17.0** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that maintain your whole Claude Code instruction surface — project and user-level CLAUDE.md, `.claude/rules/`, SKILL.md files, and auto memory — keeping every file slim without losing information, and improving themselves from the experience of real runs.
+**Version 0.17.1** ([changelog](CHANGELOG.md)) · Two personal Claude Code skills that maintain your whole Claude Code instruction surface — project and user-level CLAUDE.md, `.claude/rules/`, SKILL.md files, and auto memory — keeping every file slim without losing information, and improving themselves from the experience of real runs.
 
 Distributed as a single Claude Code plugin, `tidyclaudemd`, bundling both skills. This repo is the plugin **and** its own marketplace — no separate repo to publish to.
 
