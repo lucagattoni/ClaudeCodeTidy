@@ -4,6 +4,15 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.12.0] — 2026-07-08
+
+### Added
+- **`.claude/rules/` awareness** (read side): Step 2's orientation pass lists rules files recursively, distinguishing path-scoped (`paths:` frontmatter) from unconditional; unconditional rules are read in full for Step 2b's Consistent? check (they load *after* the project CLAUDE.md, so overlap is consistency/duplication, never Redundant-by-order). Step 1 now reads all earlier-loaded machine scopes: `~/.claude/rules/` and a managed-policy CLAUDE.md when present (plan: `plans/claude-md-scope-tensions-plan.md` item 5 part a; user directive 2026-07-08).
+- **`.claude/rules/` as a RELOCATE destination** (write side): path-scoped rule files join the relocation-home inventory and the RELOCATE test — a fact/constraint mattering only for part of the codebase relocates to a path-scoped rule, a procedure still goes to a skill; never introduced into a repo that doesn't already use `.claude/rules/` without asking. New evidence rule: verbatim duplicates in an unconditional rule are DELETE-eligible, in a path-scoped rule CHALLENGE-only (deleting would narrow always-loaded content to conditional — a user-only scope decision) (plan item 5 part b).
+
+### Changed
+- RELOCATE test now cites the official every-session vs. sometimes/path-scoped framing directly, sharpening borderline COMPRESS-vs-RELOCATE calls (plan item 1, folded into the same table-row edit).
+
 ## [0.11.0] — 2026-07-08
 
 ### Added
