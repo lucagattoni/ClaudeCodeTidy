@@ -4,6 +4,11 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.13.0] — 2026-07-08
+
+### Added
+- **`~/.claude` versioning bootstrap** (Step 0 preflight): when a run may write under `~/.claude`, the skill checks whether it's a git repository and, if not, proposes `git init` with an ignore-all + allowlist `.gitignore` (shown in full — it's the safety mechanism; credentials/transcripts/memory/plugins stay untracked by default). Never auto-created — home-directory repo-init is a user-only decision; declining keeps `~/.claude` writes confirm-first. Any future remote must be verified private before push; memory is never tracked (mission plan Phase 1; user decision 2026-07-08: in-place allowlist repo over dotfiles-manager/mirror/none).
+
 ## [0.12.0] — 2026-07-08
 
 ### Added

@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy
 description: Scan every CLAUDE.md in the current repo against the global "CLAUDE.md hygiene" rules and slim it by relocating/compressing content — never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md.
-version: 0.12.0
+version: 0.13.0
 ---
 
 # /tidyclaudemd:claudemd-tidy
@@ -28,6 +28,22 @@ A report-only run still appends a Step 7 run record (tag it analyze-only in the 
 3. Check repo visibility (`gh repo view --json visibility` or inspect the remote). If public or unknown → the **PRIMARY CHECK** in `~/.claude/CLAUDE.md` applies to every file this skill writes, including relocated content.
 4. **Encryption check.** Scan for git-crypt/SOPS filters in `.gitattributes` or an `.age` key reference. If found, flag it: in Step 3, any encryption-unlock instructions in the CLAUDE.md are force-classified **KEEP** (never RELOCATE — moving them risks a chicken-and-egg lock-out); any other RELOCATE destination must be verified as covered by the same encryption scope as the source before Step 5 executes it.
 5. **CI-dependency check.** Scan CI config (`.github/workflows/` and any other CI directories at the repo root) for scripts that reference `CLAUDE.md` — or any file a CLAUDE.md imports — by filename (e.g. a script that greps its content for a required phrase). If found, flag the content those scripts appear to depend on: it's ineligible for RELOCATE in Step 5 without the user's explicit confirmation in Step 4 that the CI dependency is accounted for.
+
+6. **User-level versioning check.** If this run may write anything under `~/.claude` (a promote-to-global resolution is on the table, or a user-level target is in scope): check whether `~/.claude` is a git repository. If it isn't, **propose — never auto-create** — the bootstrap (repo-initialization in the home directory is a user-only decision): `git init` plus this allowlist `.gitignore`, shown to the user in full since it is the safety mechanism:
+
+   ```gitignore
+   *
+   !.gitignore
+   !CLAUDE.md
+   !rules/
+   !rules/**
+   !skills/
+   !skills/**
+   !commands/
+   !commands/**
+   ```
+
+   The ignore-all default keeps credentials, transcripts, auto memory, and plugins untracked *by default*, not by remembering to exclude them. Track only `*.md` and skill assets; verify with `git status` after init that nothing sensitive is staged. If the user declines, `~/.claude` writes stay confirm-first and the Step 6 report notes them as unversioned. If a remote is ever configured for this repo, it must be verified **private** before any push (PRIMARY CHECK) — memory is never tracked regardless.
 
 ## Step 1 — Load the rules
 
