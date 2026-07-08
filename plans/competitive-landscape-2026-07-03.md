@@ -1,119 +1,110 @@
 # Competitive landscape — CLAUDE.md maintenance tools
 
-Source: GitHub search (`gh search repos`) across `CLAUDE.md optimize/tidy/slim/cleanup`, `AGENTS.md maintain`, `claude memory hygiene`, plus direct repo inspection (`gh repo view`) of every plausible match. Triggered by the repo rename to `TidyClaudeMD`, to sanity-check whether the name and positioning collide with an existing tool. Confirmed: `lucagattoni/TidyClaudeMD` is the current public name, visibility PUBLIC.
+Source: GitHub search (`gh search repos`) across `CLAUDE.md optimize/tidy/slim/cleanup`, `AGENTS.md maintain`, `claude memory hygiene`, `.claude/rules`, `SKILL.md lint`, plus direct repo inspection (`gh repo view`) of every plausible match. Triggered by the repo rename to `TidyClaudeMD`, to sanity-check whether the name and positioning collide with an existing tool. Confirmed: `lucagattoni/TidyClaudeMD` is the current public name, visibility PUBLIC.
 
-**Bottom line (2026-07-03): no name collision, but a crowded and well-developed niche.** At least four repos solve the identical problem ("CLAUDE.md is bloated, shrink it losslessly").
-
-**Purpose of this document.** For each project worth documenting — selected because it's *relevant to improving TidyClaudeMD*, not merely because it exists — state plainly what TidyClaudeMD lacks relative to it. Every gap below is a real, shipped capability in another tool that TidyClaudeMD does not currently have.
+**Inclusion bar.** A project earns a place in this document only if it brings a **fresh idea or feature genuinely worth implementing in TidyClaudeMD** — not because it exists, not because it's a nominal competitor, and not just because it's another entry in a crowded niche. Every entry below states, specifically, what that idea is. Projects reviewed and found to bring nothing implementable are listed once, briefly, at the bottom — for the record, not as competitors.
 
 ---
 
-_**Updated 2026-07-09** against TidyClaudeMD v0.20.2 (up from v0.9.1 at the original pass — scope expanded from CLAUDE.md-only to four target classes: project/user CLAUDE.md, `.claude/rules/`, `SKILL.md` skills, and auto memory, plus a self-improving reflect loop and a git-commit-per-iteration reversibility gate). Re-checked all 9 previously catalogued repos (all still active, none archived) and closed out two gaps the original pass had flagged (encryption-awareness, CI-dependency scanning — both shipped in v0.6.0). Searched fresh angles matching the expanded scope and found **two substantial new competitors**, both scoped to the `--skills` class: `TheStack-ai/pulser` and `nick2781/claudoctor`. Three more repos surfaced with near-zero signal and no gap worth recording. Ranked gap list: [Gaps to close, ranked by evidence](#gaps-to-close-ranked-by-evidence-updated-2026-07-09)._
+_**Updated 2026-07-09** against TidyClaudeMD v0.20.2 (up from v0.9.1 at the original 2026-07-03 pass — scope expanded from CLAUDE.md-only to four target classes: project/user CLAUDE.md, `.claude/rules/`, `SKILL.md` skills, and auto memory, plus a self-improving reflect loop and a git-commit-per-iteration reversibility gate). Re-checked all 9 previously catalogued repos; two ideas from the original pass (encryption-awareness, CI-dependency scanning) are already built in, shipped in v0.6.0. Searched fresh angles matching the expanded scope and found two new `--skills`-class projects that clear the bar: `TheStack-ai/pulser` and `nick2781/claudoctor`. Re-applied the inclusion bar to the full set — two previously-listed projects (`NicoAcosta/claude-md-optimizer`, `BayramAnnakov/claude-reflect`) no longer clear it and moved to "Reviewed, no fresh idea." Ranked idea list: [Features worth prototyping](#features-worth-prototyping-ranked-by-convergence)._
 
 ---
 
-## Direct competitors (same problem: shrink a bloated CLAUDE.md)
+## Projects that clear the bar
 
 ### `wrsmith108/claude-md-optimizer` (19 stars, active — pushed 2026-06-25)
-Progressive-disclosure optimizer for CLAUDE.md, AGENTS.md, and copilot-instructions.md in one tool — a 6-phase workflow (detect → constraints → plan → review → execute → validate), using each format's own native sub-doc mechanism rather than generic markdown links.
+Progressive-disclosure optimizer for CLAUDE.md, AGENTS.md, and copilot-instructions.md in one tool.
 
-**Gap:** TidyClaudeMD only handles Claude Code's own CLAUDE.md — it detects whether AGENTS.md is *imported* but never audits or slims AGENTS.md's own content, and has no coverage of copilot-instructions.md at all. wrsmith108 covers all three in one pass.
+**Idea 1 — format-native multi-file coverage.** Uses each format's own sub-doc mechanism (`@import` for CLAUDE.md, nested files for AGENTS.md, path-scoped instructions for Copilot) to cover all three in one pass, rather than treating a sibling instruction file as out of scope. A version of this for TidyClaudeMD would promote AGENTS.md from an import-visibility check to a fully audited target, and extend to copilot-instructions.md the same way.
 
-**Gap:** wrsmith108 published a measured eval of its rich-abstract-pointer pattern (thin link → agent re-opened the sub-doc 5/5 times on test questions; rich abstract → 1-2/5). TidyClaudeMD mandates the identical pattern by rule (RELOCATE's rich-abstract pointer) but has never measured whether its own output achieves the same reduction — the design assumption is unverified.
+**Idea 2 — a measured eval of the rich-abstract pointer.** Published a small usage study (thin link → agent re-opened the sub-doc 5/5 times on test questions; rich abstract → 1-2/5) rather than asserting the pattern works. TidyClaudeMD's RELOCATE verdict already mandates a rich-abstract pointer by rule — a lightweight post-RELOCATE eval, generating a few realistic questions about the relocated content and checking via a fresh read whether the pointer alone answers them, would turn that rule from an assumption into a measured, self-validating one.
 
 ### `geuneda/claude-md-optimizer` (2 stars, dormant since 2026-03-18)
-Scoring-and-linting-first: a 0-100 automated score, regex anti-pattern detection, non-English token-overhead detection, session-cost estimation, and a standalone Python script that runs the whole analysis outside any agent session.
+Scoring-and-linting tool for CLAUDE.md.
 
-**Gap:** geuneda's analysis script needs no LLM session at all — it's a free, instant, CI-runnable check. TidyClaudeMD's closest equivalent, `--report` mode, still only ever runs inside a live Claude Code session; there is no standalone entry point.
-
-**Gap:** geuneda's token-overhead figures are still heuristic like TidyClaudeMD's own, but its non-English detection and per-file scoring are packaged as a `--json` machine-readable output for automation — TidyClaudeMD's report mode has no machine-readable output mode.
-
-### `NicoAcosta/claude-md-optimizer` (0 stars, dormant since 2026-04-05)
-Simple 4-phase workflow, hard target <50 lines. Distributed via skills.sh, a plugin marketplace, and support for Cursor, Codex/OpenCode, and Gemini CLI in the same package.
-
-**Gap:** NicoAcosta installs into four different agent ecosystems from one package. TidyClaudeMD is a Claude-Code-only plugin, with no distribution path to Cursor, Codex, OpenCode, or Gemini CLI users at all.
+**Idea — a combined budget across every loaded instruction source, not just per-file.** Enforces a numeric guardrail *per file type* (project CLAUDE.md ≤150 lines, user CLAUDE.md ≤50, each `.claude/rules/*.md` ≤30, `MEMORY.md` ≤200) **and** a combined total across all of them at once (≤250 lines, optimal ≤180). A single trackable number for "how much context does this session actually load, end to end" is a genuinely different signal than any one file's own guardrail — and Step 2's survey already assembles the full picture (every CLAUDE.md, every rules file, and with `--all`, every target class) that computing it would need.
 
 ### `Pinkers01/claude-md-optimizer` (0 stars, dormant since 2026-05-06)
-A standalone GUI app (macOS/.app, Windows/.exe, or a single HTML file), not a Claude Code skill — 100% client-side, drag-and-drop keep/move/delete, duplicate + contradiction detection against a small hardcoded conflict-pair library (e.g. "Stripe vs Mollie").
+A standalone GUI app, not a Claude Code skill — duplicate + rule-contradiction detection against a small hardcoded conflict-pair library (e.g. "Stripe vs Mollie").
 
-**Gap:** Pinkers01 works over *any* pasted LLM context file with zero install and no Claude Code dependency — a user who doesn't use Claude Code at all, or who just wants a one-off check, has no equivalent path into TidyClaudeMD, which requires a full plugin install and a live session.
-
-**Gap:** Pinkers01 ships an explicit library of known contradiction patterns (specific named conflicts, not just shapes). TidyClaudeMD's Consistent? test probes contradiction *shapes* (autonomy vs. ask-first, etc.) but has no equivalent of a maintained, explicit pattern library for domain-specific recurring conflicts.
+**Idea — an explicit, maintained contradiction-pattern library.** TidyClaudeMD's Consistent? test already probes contradiction *shapes* generically (autonomy vs. ask-first, default vs. exception, conflicting thresholds). A small, explicit, growing list of specific, named recurring conflicts alongside it would be a cheap complement — and a natural thing for the reflect loop to grow over time as real contradictions get resolved across repos.
 
 ### `tsalkin/claude-memory-hygiene` (1 star, active — pushed 2026-06-19)
-Targets `MEMORY.md` specifically — the same artifact TidyClaudeMD's `--memory` class now covers. Zero-dependency Python CLI, dry-run by default, archives (never deletes) stale files using a pin/volatile regex split, no LLM judgment involved.
+A zero-dependency Python CLI targeting `MEMORY.md` — the exact artifact TidyClaudeMD's `--memory` class covers.
 
-**Gap:** tsalkin runs with zero session cost — a cron job or pre-commit hook, no LLM call at all. TidyClaudeMD's `--memory` class always requires a live Claude Code session to run any check, cheap or not.
+**Idea — a zero-session mechanical tier for memory hygiene.** Runs with no LLM call at all: a pin/volatile regex split, dry-run by default, archive-never-delete. A mechanical pre-tier for TidyClaudeMD's `--memory` class — file age/size only, no content judgment, cron- or hook-runnable — would be a genuine complement to the content-aware judgment the full class already does, for the moments a live session isn't worth spinning up.
 
-### `TheStack-ai/pulser` (18 stars, active — pushed 2026-06-30) — **new, 2026-07-09**
-Full doc: [`competitors/thestack-ai-pulser.md`](competitors/thestack-ai-pulser.md). A dedicated `SKILL.md` linter with a standout feature: **`pulser eval`** actually *runs* a skill against YAML-defined test cases via `claude -p` and asserts on the output, tracking regressions across runs with a distinct exit code from a fresh failure.
+### `TheStack-ai/pulser` (18 stars, active — pushed 2026-06-30)
+Full doc: [`competitors/thestack-ai-pulser.md`](competitors/thestack-ai-pulser.md). A `SKILL.md` linter.
 
-**Gap:** TidyClaudeMD's `--skills` class only checks structural hygiene (description quality, progressive disclosure, frontmatter) — it has no way to verify a skill actually *behaves* correctly, and no way to detect that a previously-working skill has silently regressed. pulser does both.
+**Idea 1 — skill behavioral testing (`pulser eval`).** Actually *runs* a skill against YAML-defined test cases via `claude -p` and asserts on the output, tracking regressions across runs with a distinct exit code from a fresh failure. Of everything found across both search passes, this is the single idea with the clearest payoff for the least conceptual distance from what TidyClaudeMD already does: a regression is exactly "this skill's eval passed in an earlier run log, fails now," and the log format already has the raw material for that comparison. A `--skills --eval` mode would move the `--skills` class from checking structure to checking behavior.
 
-**Gap:** pulser's reversibility (single-level backup + `undo`) works with zero git dependency. TidyClaudeMD's reversibility gate requires the target to be git-tracked to apply autonomously at all — an ungated, non-git target always falls back to confirm-first, with no lighter-weight safety net in between.
+**Idea 2 — reversibility without git.** A single-level backup-and-`undo` — lighter than TidyClaudeMD's per-iteration commits, but needing zero version control. A lighter fallback tier built the same way, for `--skills`/`--memory` targets that aren't git-tracked, would extend autonomous-safe editing to cases the current reversibility gate routes to confirm-first today.
 
-**Gap:** pulser ships as a real GitHub Action on the Marketplace, with documented exit codes (`0`/`1`/`2`, `--strict` promotes warnings to errors) built to gate a pull request. TidyClaudeMD has no CI-native distribution at all.
+### `nick2781/claudoctor` (0 stars, active — created 2026-05-22, roadmap items still landing)
+Full doc: [`competitors/nick2781-claudoctor.md`](competitors/nick2781-claudoctor.md). A cross-agent skill/CLAUDE.md linter — the most structurally ambitious single find in this search.
 
-### `nick2781/claudoctor` (0 stars, active — created 2026-05-22, roadmap items still landing) — **new, 2026-07-09**
-Full doc: [`competitors/nick2781-claudoctor.md`](competitors/nick2781-claudoctor.md). `claudoctor skills` scans **cross-agent** (Claude, Codex, Hermes, Cursor) skill directories — including plugin-marketplace caches — in one pass: exact-tokenizer token ranking, byte-identical duplicates, near-duplicates, name conflicts, and similarity-based overlap, with a savings estimate. `claudoctor report --format html` renders a single offline, shareable file.
+**Idea 1 — sweep plugin/marketplace caches, not just live skill directories.** Scans `~/.claude/plugins/cache/` and `~/.claude/plugins/marketplaces/` alongside live skill directories; its own example run found real scale there (55 duplicates, 57 conflicts across 393 skills). Not hypothetical for this repo: mid-session on 2026-07-08, this exact machine's plugin cache was found holding two full stale copies of TidyClaudeMD itself (`0.9.1/` and `0.18.0/`). Extending `--skills --user`'s locations to include plugin cache/marketplace directories would catch exactly this.
 
-**Gap:** claudoctor scans four agent ecosystems in one pass; TidyClaudeMD only ever looks at Claude Code's own directories.
+**Idea 2 — cross-skill overlap and conflict detection.** Byte-identical duplicates, near-duplicates (same body, different frontmatter), name conflicts, and similarity-based overlap (Jaccard on description tokens) — all computed *across* the skills in one sweep, not just within each file. pulser independently built a lighter version of the same idea (trigger-keyword overlap); two projects converging on it is good evidence a "Skill-overlap?" test, run once across the whole `--skills` sweep, is worth adding.
 
-**Gap:** claudoctor sweeps `~/.claude/plugins/cache/` and `~/.claude/plugins/marketplaces/`, not just live skill directories — and its own example run found real scale there (55 duplicates, 57 conflicts across 393 skills). TidyClaudeMD's `--skills --user` never looks at plugin cache/marketplace directories at all. Not hypothetical for this repo: mid-session on 2026-07-08, this exact machine's `~/.claude/plugins/cache/tidyclaudemd/tidyclaudemd/` was found holding two full stale copies of TidyClaudeMD itself (`0.9.1/` and `0.18.0/`) — a gap a TidyClaudeMD run would never have surfaced on its own.
+**Idea 3 — exact tokenization.** Real per-file token counts via `@anthropic-ai/tokenizer`, not an estimate. Swapping a real tokenizer call into `--report`'s mechanical-checks tier (already scriptable and judgment-free) would sharpen every size/cost number the suite reports, replacing today's heuristics.
 
-**Gap:** claudoctor computes exact per-file token counts via `@anthropic-ai/tokenizer`. TidyClaudeMD's size/cost figures (session-cost estimate, non-English overhead) are all heuristic estimates, never a real tokenizer call.
+**Idea 4 — a shareable, offline report artifact.** `report --format html` — one file, dark-mode aware, severity counts, review columns — built for a team to look at together, not just the person who ran the tool. The project already has dataviz/artifact-design tooling available in-session, making an equivalent `--report --output report.html` a low-effort extension.
 
-**Gap:** claudoctor detects cross-skill duplication (byte-identical, near-duplicate via frontmatter drift, name conflicts, semantic overlap via Jaccard similarity). TidyClaudeMD's `--skills` class interrogates each `SKILL.md` file in isolation — there is no cross-file test at all.
+**Idea 5 — a missing-content completeness check.** Flags a CLAUDE.md missing canonical sections (Tone, Tools, Workflow). A version of this for TidyClaudeMD should route through CHALLENGE ("no build/test commands documented anywhere — intentional, or missing?") rather than auto-inserting boilerplate, staying consistent with how the suite treats anything only a human can judge.
 
-**Gap:** claudoctor's `claudemd` command flags missing canonical sections (Tone, Tools, Workflow) — a completeness check. TidyClaudeMD only ever asks "should this content stay, move, or go" — it has no check for content that should exist but doesn't.
+### `alirezarezvani/ClaudeForge` (402 stars)
+Generates and continuously syncs CLAUDE.md to match the codebase — a different problem (accuracy, not bloat) with one mechanism worth borrowing.
 
-**Gap:** claudoctor's `report --format html` produces a shareable, offline document for team review. TidyClaudeMD's only durable output is the machine-oriented run log — nothing renders a human-shareable report.
+**Idea — a hard-enforced size cap, not just an advisory one.** A `PostToolUse` hook that hard-blocks at 150 lines, enforced by the hook itself, not LLM judgment. A stricter variant of TidyClaudeMD's existing advisory-only companion hook — for users who want a hard line instead of a reminder — would be a small, self-contained addition.
+
+### `severity1/claude-code-auto-memory` (152 stars)
+Auto-updates CLAUDE.md at end of turn — a growth-oriented tool, but its execution model is worth borrowing.
+
+**Idea — isolated-agent execution to protect the main session's context.** Runs its update logic in a separate agent specifically so the work doesn't spend the invoking session's own context budget. A fork/sub-agent execution mode for a heavy `--skills`/`--memory`/`--all` run would let a large tidy pass happen without spending the invoking session's own context on it.
+
+### `agent-sh/agnix` (334 stars, active — pushed 2026-07-05)
+A 432-rule correctness linter for CLAUDE.md/AGENTS.md/SKILL.md/hooks/MCP configs — a different problem (is this file broken, not is it bloated) with a distribution shape worth noting.
+
+**Idea — IDE-level presence.** Ships as VS Code, JetBrains, Neovim, and Zed extensions surfacing findings inline, not just a CLI or a conversational skill. No CLAUDE.md/rules/skills/memory hygiene tool found in this search has any IDE-level presence at all — an open surface for whoever builds it first.
 
 ---
 
-## Minor / low-signal mentions (2026-07-09, no dedicated docs)
+## Reviewed, no fresh idea (2026-07-09)
 
-Found via the same search sweep; CLAUDE.md optimization is a small feature within a broader tool for two of these, all at 0-1 stars with no recent momentum, and none exposed a gap worth recording:
+Projects genuinely reviewed and found to bring nothing implementable beyond what's already better represented above, or nothing relevant to TidyClaudeMD's actual mission. Kept here for the record so the search isn't silently re-run later.
 
-| Repo | Stars | What it actually does |
+| Repo | Stars | Why it doesn't clear the bar |
 |---|---|---|
-| `sgamma/skills` | 0 | Personal skill collection; one of the skills is a progressive-disclosure CLAUDE.md optimizer |
-| `BENZEMA216/self-purify` | 0 | "Self-purification" plugin bundling a security audit, CLAUDE.md optimization, and session-pattern analysis |
-| `Goodsmileduck/claude-registry` | 1 | Community plugin marketplace (DevOps skill packs, diagramming); CLAUDE.md optimization is one listed capability among several |
+| `NicoAcosta/claude-md-optimizer` | 0 | Simplest of the direct competitors methodologically; its one distinguishing trait — distribution to skills.sh, Cursor, Codex/OpenCode, Gemini CLI — is a packaging decision, not an implementable feature, and porting TidyClaudeMD's actual invocation surface to other agent runtimes is a different-product question |
+| `BayramAnnakov/claude-reflect` | 1,235 | Mines session history to auto-generate slash commands from repeated patterns — a different mission (growing new capability) from TidyClaudeMD's (shrinking existing instruction files) |
+| `sgamma/skills` | 0 | Personal skill collection; its CLAUDE.md optimizer is a minor, undifferentiated feature |
+| `BENZEMA216/self-purify` | 0 | CLAUDE.md optimization is one minor feature of a broader security/audit plugin, nothing distinctive |
+| `Goodsmileduck/claude-registry` | 1 | CLAUDE.md optimization is one listed capability of a plugin marketplace, nothing distinctive |
+| `Pinkers01/claude-md-optimizer` — zero-install GUI aspect | — | The GUI-over-pasted-text shape itself (as opposed to its contradiction-pattern library, listed above) can't do repo-grounded verification, which is core to how TidyClaudeMD works — a different product, not a feature to add |
 
 ---
 
-## Adjacent tools (different problem, same file)
+## Features worth prototyping, ranked by convergence
 
-Not direct competitors — but each exposes at least one real gap worth naming.
+Each idea is cited to the specific project(s) it came from — every one above cleared the "worth implementing" bar. Ranked by how many independent projects converged on the same idea, then by how concretely it applies to this repo.
 
-| Repo | Stars (2026-07-09) | What it actually does | Gap it exposes |
-|---|---|---|---|
-| `alirezarezvani/ClaudeForge` | 402 | **Generates** and continuously **syncs** CLAUDE.md to match the codebase; a hard 150-line cap enforced by a `PostToolUse` hook, not LLM judgment | TidyClaudeMD's own companion hook is advisory-only (it nags, never blocks). ClaudeForge shows a hard-enforced cap is a real, shipped alternative — TidyClaudeMD has no equivalent enforcement mechanism at all, hook-based or otherwise. |
-| `severity1/claude-code-auto-memory` | 152 | Auto-updates CLAUDE.md at end of turn via marker-based sections, in an isolated agent to protect main-session context | TidyClaudeMD's `--memory`/`--skills` classes run inline in the invoking session, spending its context directly — no isolated-agent execution mode exists to keep a heavy tidy run's context cost off the main session. |
-| `BayramAnnakov/claude-reflect` | 1,235 | Mines session history for repeatable workflow patterns to promote into slash commands, on top of capturing corrections into CLAUDE.md | `claudemd-tidy-reflect`'s only evidence source is its own structured run logs — it has no mechanism to mine raw session history for signal the way claude-reflect does. |
-| `agent-sh/agnix` | 334 | Linter/LSP validating CLAUDE.md, AGENTS.md, SKILL.md, hooks, and MCP configs against 432 correctness rules; IDE plugins (VS Code, JetBrains, Neovim, Zed) + GitHub Action + autofix | agnix ships IDE-level integration (VS Code, JetBrains, Neovim, Zed) and a GitHub Action. TidyClaudeMD has no IDE presence and no CI distribution of any kind. |
-
----
-
-## Gaps to close, ranked by evidence (updated 2026-07-09)
-
-Each gap below is cited to the specific project(s) that exposed it. Ranked by how many independent projects converge on the same gap, then by how directly it's evidenced against this repo specifically.
-
-1. **No skill behavioral testing.** *(pulser)* — `--skills` only checks structure, never behavior; no regression detection across runs despite the run-log history already having the raw material for it.
-2. **No cross-skill overlap/conflict detection.** *(pulser, claudoctor — two independent projects)* — each `SKILL.md` is judged in isolation; nothing catches trigger-description overlap or near-duplicate skill bodies within the same repo.
-3. **No headless / CI-native entry point.** *(geuneda, tsalkin, pulser, claudoctor, agnix — five independent projects)* — TidyClaudeMD is 100% conversational; not even `--report` mode's mechanical-checks tier, despite being designed as judgment-free, can run outside a live session.
-4. **No coverage beyond Claude Code's own ecosystem.** *(wrsmith108, NicoAcosta, claudoctor — three independent projects)* — no AGENTS.md content audit (import-detection only), no copilot-instructions.md, no `~/.codex/`, `~/.hermes/`, or `~/.cursor/rules/` awareness.
-5. **No exact tokenization.** *(claudoctor)* — every size/cost figure the suite reports (session-cost estimate, non-English overhead) is a heuristic, never a real tokenizer call.
-6. **No sweep of plugin/marketplace caches.** *(claudoctor)* — confirmed on this exact machine: two stale copies of TidyClaudeMD itself sat undetected in `~/.claude/plugins/cache/`.
-7. **No non-git reversibility fallback.** *(pulser)* — an ungated, non-git-tracked target always falls back to confirm-first; no lighter backup-and-undo tier exists in between.
-8. **RELOCATE's rich-abstract pointer is unverified.** *(wrsmith108)* — the pattern is mandated by rule but never measured against TidyClaudeMD's own output the way wrsmith108 measured its own.
-9. **No shareable report artifact.** *(claudoctor)* — the only durable output is the machine-oriented run log; nothing renders a human-shareable document for team review.
-10. **No missing-content / completeness check.** *(claudoctor)* — TidyClaudeMD only ever asks whether existing content should stay, move, or go, never whether something important is absent.
-11. **No explicit contradiction-pattern library.** *(Pinkers01)* — Consistent? probes contradiction shapes generically; no maintained list of specific, named recurring conflicts.
-12. **No hard-enforced size cap.** *(ClaudeForge)* — the companion hook is advisory-only; no hook-based hard block exists as an option.
-13. **No isolated-agent execution mode.** *(severity1/claude-code-auto-memory)* — heavy tidy runs spend the invoking session's own context directly.
-14. **No zero-install, paste-and-check entry point.** *(Pinkers01)* — every use of TidyClaudeMD requires the plugin installed and a live session; no lightweight alternative for a one-off check or a non-Claude-Code user.
+1. **Skill behavioral testing.** *(pulser)* — a `--skills --eval` mode, reusing the run-log history to detect regressions.
+2. **Cross-skill overlap/conflict detection.** *(pulser, claudoctor — two independent projects)* — a "Skill-overlap?" test run once across a whole sweep, not per-file.
+3. **A combined budget across all loaded instruction sources.** *(geuneda)* — one number for project + user + rules + memory together.
+4. **Multi-format, multi-ecosystem coverage.** *(wrsmith108, claudoctor — two independent projects)* — AGENTS.md as a full target, copilot-instructions.md, and awareness of `~/.codex/`, `~/.hermes/`, `~/.cursor/rules/`.
+5. **Exact tokenization.** *(claudoctor)* — a real tokenizer call in place of heuristic size/cost estimates.
+6. **Sweeping plugin/marketplace caches.** *(claudoctor)* — confirmed valuable on this exact machine.
+7. **A non-git reversibility fallback.** *(pulser)* — backup-and-undo for targets the current gate can't autonomously touch.
+8. **Measuring the rich-abstract pointer.** *(wrsmith108)* — a self-validating check for a rule TidyClaudeMD already enforces.
+9. **A shareable report artifact.** *(claudoctor)* — an HTML/Markdown export of the plan or summary.
+10. **A missing-content completeness check.** *(claudoctor)* — routed through CHALLENGE, never auto-inserted.
+11. **An explicit contradiction-pattern library.** *(Pinkers01)* — grown over time by the reflect loop.
+12. **A zero-session mechanical tier for memory hygiene.** *(tsalkin)* — cron- or hook-runnable, no LLM call.
+13. **A hard-enforced size cap option.** *(ClaudeForge)* — a stricter sibling to the existing advisory hook.
+14. **Isolated-agent execution for heavy runs.** *(severity1/claude-code-auto-memory)* — protects the invoking session's own context.
+15. **IDE-level presence.** *(agnix)* — a distribution surface no tool in this niche has claimed yet.
 
 ### What this doesn't change
 
