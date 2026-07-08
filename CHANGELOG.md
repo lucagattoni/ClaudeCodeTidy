@@ -4,6 +4,13 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.11.0] — 2026-07-08
+
+### Added
+- **`@import` detection and following** (general mechanism; AGENTS.md is one instance): Step 2 detects every live import (outside backticks/fenced code blocks — a code-span mention is never an import) and Step 2b interrogates the **effective** CLAUDE.md including imported lines (max four documented hops; no assumed cycle safety). External imports (`@~/...`, absolute outside paths) are hedged as possibly inert (declinable one-time approval dialog — a file-content-invisible state); in-repo imports are assumed live (not approval-gated) (plan: `plans/claude-md-scope-tensions-plan.md` item 4 parts b+c; user directive 2026-07-08).
+- **AGENTS.md visibility check**: Step 2 reports whether a found AGENTS.md is imported by any CLAUDE.md (import or symlink — the only direction that matters), escalating to a repo-level CHALLENGE on unintentional-looking drift; also added to `--report` mode's mechanical checks. Never auto-adds an import (plan item 4 part a).
+- **Imported-file edit policy** (Step 5): in-repo instruction files edited directly (Step 0 encryption/CI flags extended to them); dual-purpose files (`@README`, `@package.json`) never edited — findings land on the import line; out-of-repo files audited but CHALLENGE-only with individual confirmation (user decision 2026-07-08) (plan item 4 part b).
+
 ## [0.10.0] — 2026-07-08
 
 ### Added

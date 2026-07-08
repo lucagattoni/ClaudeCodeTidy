@@ -1,7 +1,7 @@
 ---
 name: claudemd-tidy
 description: Scan every CLAUDE.md in the current repo against the global "CLAUDE.md hygiene" rules and slim it by relocating/compressing content — never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md.
-version: 0.10.0
+version: 0.11.0
 ---
 
 # /tidyclaudemd:claudemd-tidy
@@ -16,7 +16,7 @@ Optional path to a specific CLAUDE.md, and/or `--report` to run report mode (bel
 
 A cheap, no-plan, no-confirmation, no-edits pre-check for "how bad is this CLAUDE.md right now?" — skips Step 2's survey and Step 2b's seven-test interrogation entirely. Runs Step 0 (Preflight) as normal, then reports two clearly-separated tiers of output and stops:
 
-- **Mechanical checks** (scriptable, no judgment): line/token count per file vs. the global hygiene guardrail (~150 lines); non-English/CJK content flagged with an estimated token-overhead cost (non-English content runs roughly 30-50% more tokens per instruction than equivalent English); a session-cost estimate (per-request token cost × an assumed 30-turn session).
+- **Mechanical checks** (scriptable, no judgment): line/token count per file vs. the global hygiene guardrail (~150 lines); non-English/CJK content flagged with an estimated token-overhead cost (non-English content runs roughly 30-50% more tokens per instruction than equivalent English); a session-cost estimate (per-request token cost × an assumed 30-turn session); an **AGENTS.md visibility check** (present in the repo? imported by any CLAUDE.md, or invisible to every Claude Code session?).
 - **A rough verdict-mix impression** from a shallow read only — an approximate KEEP/COMPRESS/RELOCATE/DELETE/CHALLENGE tally. Label this explicitly as unverified judgment in the output, never with the same confidence as the mechanical counts above — verdict classification without Step 2b's real interrogation is a guess, not an analysis.
 
 A report-only run still appends a Step 7 run record (tag it analyze-only in the Result field) and explicitly states in its output that it is a heuristic pre-check, not a substitute for a full tidy.
@@ -27,7 +27,7 @@ A report-only run still appends a Step 7 run record (tag it analyze-only in the 
 2. Sync per the global working defaults: `git fetch`, check branch/ahead-behind/dirty state.
 3. Check repo visibility (`gh repo view --json visibility` or inspect the remote). If public or unknown → the **PRIMARY CHECK** in `~/.claude/CLAUDE.md` applies to every file this skill writes, including relocated content.
 4. **Encryption check.** Scan for git-crypt/SOPS filters in `.gitattributes` or an `.age` key reference. If found, flag it: in Step 3, any encryption-unlock instructions in the CLAUDE.md are force-classified **KEEP** (never RELOCATE — moving them risks a chicken-and-egg lock-out); any other RELOCATE destination must be verified as covered by the same encryption scope as the source before Step 5 executes it.
-5. **CI-dependency check.** Scan CI config (`.github/workflows/` and any other CI directories at the repo root) for scripts that reference `CLAUDE.md` by filename (e.g. a script that greps its content for a required phrase). If found, flag the content those scripts appear to depend on: it's ineligible for RELOCATE in Step 5 without the user's explicit confirmation in Step 4 that the CI dependency is accounted for.
+5. **CI-dependency check.** Scan CI config (`.github/workflows/` and any other CI directories at the repo root) for scripts that reference `CLAUDE.md` — or any file a CLAUDE.md imports — by filename (e.g. a script that greps its content for a required phrase). If found, flag the content those scripts appear to depend on: it's ineligible for RELOCATE in Step 5 without the user's explicit confirmation in Step 4 that the CI dependency is accounted for.
 
 ## Step 1 — Load the rules
 
@@ -35,13 +35,15 @@ Read the **"CLAUDE.md hygiene — keep every CLAUDE.md slim"** section of `~/.cl
 
 **If the section is missing** (first-time setup): append the contents of `${CLAUDE_PLUGIN_ROOT}/HYGIENE-RULES-TEMPLATE.md` verbatim to the end of `~/.claude/CLAUDE.md` as a new section — do not overwrite or reorder anything already in that file. Tell the user you did this and why. This is a **one-time bootstrap**: from this point on, `~/.claude/CLAUDE.md` is the sole source of truth, exactly as if the section had always been there — this skill never reads the bundled template again after the first install, and the reflect skill only ever proposes edits to the global file, never to the template.
 
-Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded scope, not just the hygiene section) — needed for Step 2b's **Redundant-by-order?** question, which can't be answered from the hygiene section alone.
+Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded scope, not just the hygiene section) — needed for Step 2b's **Redundant-by-order?** question, which can't be answered from the hygiene section alone. If the global file itself contains live `@imports`, read those too: the redundancy comparison must see the global file's *effective* content, not just its literal text.
 
 ## Step 2 — Build a complete picture of the repo
 
 **Do not analyze a single CLAUDE.md line before this step is done.** Every verdict in Step 3 must be grounded in what the repo *actually* is, not in what the CLAUDE.md claims it is.
 
 1. Find targets: `git ls-files '*CLAUDE.md' 'CLAUDE.md'` plus an untracked-file check; include nested ones. **Also** glob the filesystem directly for common gitignored personal-override filenames (starting with `CLAUDE.local.md`) — `git ls-files` and a standard untracked-file check both skip gitignored paths, so a personal-override convention would otherwise never surface. List any found explicitly in the Step 4 plan even if the user then chooses to exclude them — that must be a stated choice, not a silent gap. For each target found, record line count, word count, section list.
+   **Imports:** detect every **live `@import`** in each found CLAUDE.md — an `@path` occurrence *outside* backticks and fenced code blocks (best-effort against Claude Code's documented parsing rules; a code-span mention like `` `@README` `` is literal text, never an import). An **external** import (pointing outside the repo: `@~/...` or an absolute outside path) may be permanently inert if the user once declined Claude Code's one-time approval dialog — a state invisible in file content — so hedge any finding that depends on externally-imported content ("if this import was declined, this content may not be active in-session"); in-repo imports are not approval-gated and are assumed live. (An `InstructionsLoaded` hook is the optional companion for ground truth about what actually loads.)
+   **AGENTS.md:** also check for `AGENTS.md` at the repo root and nested. If found, determine whether any CLAUDE.md pulls it in — live `@import` or symlink; that is the only direction that matters (Claude Code doesn't read AGENTS.md; other tools don't parse `@import`). State the result in the Step 4 plan as a repo-level note: *"Found AGENTS.md at `<path>` — [not imported by any CLAUDE.md / imported by `<file>`]. Claude Code only reads CLAUDE.md; an unimported AGENTS.md is invisible to every Claude Code session."* Escalate to a **repo-level CHALLENGE** — a deliberate, documented extension of the otherwise per-block CHALLENGE verdict — when the drift looks unintentional: both files exist, no import/symlink bridges them, and grep finds overlapping rule text in both. Never auto-add an import line.
 2. **Fixed general-orientation pass** (always, regardless of CLAUDE.md size): top-level `README.md`; a listing — not a deep read — of `.claude/commands/` and `.claude/skills/`; `.claude/settings.json`.
 3. **Claim-driven verification**: extract every concrete claim each CLAUDE.md makes — file paths, command names, workflow descriptions, tool/skill references — then verify only those against the repo (targeted file/path lookups, package manifests or CI config only if a claim points there, git history only if a claim makes an assertion about change frequency or ownership). Do not read anything the CLAUDE.md makes no claim about; this is the survey's cost control — it scales with the CLAUDE.md's own length, not the repo's size.
 4. Inventory the possible relocation homes: `.claude/commands/` and `.claude/skills/` (per-task procedures), `docs/` or `plans/` (background/design), `README.md` (human-facing description).
@@ -49,7 +51,7 @@ Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded sc
 
 ## Step 2b — Critically interrogate every line
 
-Walk each CLAUDE.md **line by line** and question whether it makes sense, before any slimming verdict. For each rule/claim ask:
+Walk each **effective** CLAUDE.md **line by line** and question whether it makes sense, before any slimming verdict. "Effective" means: for every live import found in Step 2, the imported file's lines are part of this walk (recursively, to the documented maximum of four hops — bound the walk by depth, not by trust: cycle detection is not documented for imports), and Step 3 verdicts may land on blocks that physically live in an imported file. For each rule/claim ask:
 
 - **True?** Does it match the repo picture — do the files, commands, paths, and behaviors it references exist and work as described?
 - **Live?** Is it still needed, or does it govern a workflow/file that no longer exists or was superseded?
@@ -96,10 +98,14 @@ Present a plan per file:
 
 1. **Branching:** follow the repo's own conventions if its CLAUDE.md defines any (branch/worktree rules); otherwise, multi-file changes go on a branch, a single-file compress-only edit may go direct.
 2. Execute RELOCATEs first (create/extend destination files, add cross-links both ways, and write the rich-abstract pointer — not a bare "see docs/x.md" link — at the original location) — skip any still blocked by an unresolved Step 0 encryption or CI-dependency flag — then COMPRESS, then DELETE, then update the CLAUDE.md pointers.
-3. **Scope-resolution destinations:** *promote-to-global* appends the individually-confirmed content to `~/.claude/CLAUDE.md`, exactly as shown at Step 4. *Move-to-`CLAUDE.local.md`* creates the file at the repo root if missing and verifies it is gitignored (extend `.gitignore` in the same change if not). *Belongs-in-memory* writes nothing and removes nothing — the line stays untouched and is reported in Step 6; the user performs the move themselves (the documented manual path), and only a **later** run may DELETE the original, once a targeted grep finds the content verifiably present in `MEMORY.md`/topic files (normal DELETE evidence — the skill never removes a line whose destination it didn't write and can't verify).
-4. **Keep docs in sync:** grep for every moved/renamed term and update all referencing docs in the same change.
-5. **No-loss check:** for each removed line, confirm it is either present at its new home or listed in the plan as a verified DELETE. Re-read the final CLAUDE.md top to bottom for coherence.
-6. Commit with a message summarizing before/after line counts; merge/publish per the repo's conventions. Update the repo's CHANGELOG if it keeps one.
+3. **Imported-file edit policy** — verdicts can land on imported blocks (Step 2b), but where the edit goes depends on what the imported file is:
+   - *In-repo instruction files* (an imported `AGENTS.md`, `docs/git-instructions.md`, or similar file existing to instruct AI tools): edit the imported file directly; never duplicate imported content back into the CLAUDE.md. Step 0's flags extend here — the encryption same-scope verification applies to any imported file edited, and the CI-dependency grep must include imported filenames.
+   - *Dual-purpose files* (`@README`, `@package.json`, any imported file whose primary audience/function is not Claude instruction): **never edited by this skill** — a hygiene edit would damage the file's primary function. The finding lands on the **import line** in CLAUDE.md instead (e.g. CHALLENGE: "this imports the full README into every session — intended, or would a slimmer dedicated instruction file serve better?"). Unclear which kind → treat as dual-purpose and CHALLENGE, never guess an edit.
+   - *Out-of-repo files* (`@~/...`, external absolute paths): audited, never auto-edited — verdicts surface as individually-confirmed CHALLENGEs per Step 4's out-of-repo rule.
+4. **Scope-resolution destinations:** *promote-to-global* appends the individually-confirmed content to `~/.claude/CLAUDE.md`, exactly as shown at Step 4. *Move-to-`CLAUDE.local.md`* creates the file at the repo root if missing and verifies it is gitignored (extend `.gitignore` in the same change if not). *Belongs-in-memory* writes nothing and removes nothing — the line stays untouched and is reported in Step 6; the user performs the move themselves (the documented manual path), and only a **later** run may DELETE the original, once a targeted grep finds the content verifiably present in `MEMORY.md`/topic files (normal DELETE evidence — the skill never removes a line whose destination it didn't write and can't verify).
+5. **Keep docs in sync:** grep for every moved/renamed term and update all referencing docs in the same change.
+6. **No-loss check:** for each removed line, confirm it is either present at its new home or listed in the plan as a verified DELETE. Re-read the final CLAUDE.md top to bottom for coherence.
+7. Commit with a message summarizing before/after line counts; merge/publish per the repo's conventions. Update the repo's CHANGELOG if it keeps one.
 
 ## Step 6 — Report
 
