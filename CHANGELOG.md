@@ -4,6 +4,14 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.16.0] — 2026-07-08
+
+### Added
+- **Memory target class** (`--memory`): the current project's auto-memory directory (`MEMORY.md` + topic files) becomes a full read+write target — **snapshot-first**: the whole directory is copied to `${CLAUDE_PLUGIN_DATA}/memory-backups/<slug>/<timestamp>/` before any edit (no snapshot, no edit; memory is never git-tracked). Tests: Index-is-an-index?, Topic-dedup?, Still-true?, and Promote? (a memory entry reading like a deliberate every-session rule → CHALLENGE suggesting promotion to CLAUDE.md, individually confirmed). Memory content never lands in any repo-tracked file (mission plan Phase 2, user decision 2026-07-08 — supersedes the 0.10.0-era never-write stance with snapshot-protected writes).
+
+### Changed
+- Tidy skill frontmatter description updated to cover all four target classes (it drives skill triggering).
+
 ## [0.15.0] — 2026-07-08
 
 ### Added
