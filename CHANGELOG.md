@@ -4,6 +4,12 @@ All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Fo
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-07-08
+
+### Added
+- Sixth Step 2b question **Correctly-scoped?**: flags a project CLAUDE.md line that is really a generic cross-project preference (→ user `~/.claude/CLAUDE.md`) or a personal repo-specific preference (→ `CLAUDE.local.md`); fires only when the content isn't already in an earlier-loaded scope (that's Redundant-by-order's case). Routes to CHALLENGE only — scope intent is a user-only decision. New Step 4 resolutions *promote-to-global* / *move-to-local*, with the new rule that **out-of-repo writes are confirmed individually, never bundled into a bulk approve-all** (apply-phase discipline chosen over a seventh invariant — user decision 2026-07-08) (plan: `plans/claude-md-scope-tensions-plan.md` item 2; user directive 2026-07-08).
+- Seventh Step 2b question **Rule-vs-memory?**: flags a line that reads like an agent-discovered pattern rather than a deliberate team rule. CHALLENGE-only; the *belongs-in-memory* resolution writes nothing and removes nothing — the user moves it manually, and only a later run with a targeted grep confirming the content in memory may DELETE the original (no-loss preserved) (plan item 3; user directive 2026-07-08).
+
 ## [0.9.1] — 2026-07-03
 
 ### Fixed
