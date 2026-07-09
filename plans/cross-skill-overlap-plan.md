@@ -11,29 +11,31 @@ Extend `claudemd-tidy`'s `--skills` class with a **sweep-level** analysis pass: 
 
 ## Design
 
-### The four checks (Step 2, new sweep-level bullet)
+### The four checks (sweep-level pass)
 
-Run once per `--skills` sweep, over all skills in scope (project `.claude/skills/`; plus `~/.claude/skills/` when combined with `--user`):
+**Placement:** the full spec lives in the **Target classes table's Skills row** (where all class-specific behavior already lives), as a named addition — "Sweep-level checks" — after the three existing per-file tests; Step 2 gets only a one-line pointer in its orientation-pass bullet ("for `--skills`, also run the Skills row's sweep-level checks across all skills found"). This keeps Step 2's numbered list class-agnostic, matching how the class table already owns `--memory`'s snapshot rule.
+
+Run once per `--skills` sweep, over all skills in scope (project `.claude/skills/`; plus `~/.claude/skills/` when combined with `--user`; `--all` composes identically to `--skills --user` here, so cross-scope pairs are compared whenever both scopes are swept):
 
 | Check | Mechanics | Evidence grade |
 |---|---|---|
-| **Duplicate?** | Byte-identical `SKILL.md` content at ≥2 paths — `shasum` over each file, group by hash | Mechanical, grep-confirmable |
+| **Duplicate?** | Byte-identical `SKILL.md` content at ≥2 paths — `shasum` over each file, group by hash | Mechanical, hash-confirmable |
 | **Near-duplicate?** | Identical body but different frontmatter — `shasum` over content with the YAML frontmatter block stripped (`awk` past the second `---`), grouped; flag groups whose full-content hashes differ | Mechanical |
-| **Name-conflict?** | Same frontmatter `name:` in ≥2 skills whose content differs — matters because the name is the invocation key (`/name`), so two different skills competing for one name is a real collision, not just waste | Mechanical |
+| **Name-conflict?** | Same frontmatter `name:` in ≥2 skills whose content differs. Claude Code already disambiguates *some* clash shapes (nested-directory skills get `<dir>:<name>` qualified names; plugin skills are namespaced), so a genuine conflict needs one of two shapes this check targets: (a) a frontmatter `name:` that differs from its directory basename and collides with another skill's name — note the per-file **Frontmatter-sane?** test already flags the name/dirname mismatch itself, so this check adds the *pairing* (who it collides with), not the mismatch; (b) the same name across scopes (project vs. user), where load precedence silently decides which one the model sees — a shadowing ambiguity worth surfacing even though nothing "breaks" | Mechanical |
 | **Trigger-overlap?** | Two skills whose `description`s would plausibly fire on the same user request. Mechanical assist first (pulser-style: quoted phrases appearing in ≥2 descriptions; plus high word-overlap between descriptions), then LLM judgment on the candidates — this suite runs *as* an LLM, so it can judge "would these two descriptions race for the same prompt?" directly instead of approximating with Jaccard the way claudoctor must | Judgment, mechanically pre-filtered |
 
-All four are cheap: hashing is one `shasum` pass over files already inventoried by Step 2, and the pairwise judgment only runs on mechanically pre-filtered candidates, not all N² pairs.
+All four are cheap: hashing is one `shasum` pass over files already inventoried by the sweep. The mechanical pre-filter for Trigger-overlap? does compare all description pairs — but descriptions are short strings already read during the sweep, so that comparison costs nothing meaningful; the *LLM judgment* step is what's restricted to pre-filtered candidates. A skill whose frontmatter is malformed (no parseable `name:`/`description:`) is skipped by the sweep checks with a note — the per-file **Frontmatter-sane?** test already owns flagging it; the sweep must not crash on it.
 
 ### Verdict routing (Step 3)
 
 Consistent with the suite's existing philosophy — mechanical evidence never auto-deletes a *skill*, because removing a whole skill is a scope/intent decision, not a dedup line-edit:
 
-- **Duplicate** → **CHALLENGE**, evidence-cited (both paths + matching hash): "these two files are byte-identical — which is the canonical home?" Removing one is DELETE-grade *evidence*, but *which* copy survives is user-only. Follows the sweep-level CHALLENGE precedent set by the AGENTS.md visibility check (v0.11.0).
+- **Duplicate** → **CHALLENGE**, evidence-cited (both paths, matching hash, and the redundant copy's size in lines — the waste figure stays line-based for now, per the tokenization bullet below): "these two files are byte-identical — which is the canonical home?" Removing one is DELETE-grade *evidence*, but *which* copy survives is user-only. Follows the sweep-level CHALLENGE precedent set by the AGENTS.md visibility check (v0.11.0).
 - **Near-duplicate** → **CHALLENGE**, citing the diff of the two frontmatters: "same procedure, two names/descriptions — intentional variant or drift?"
 - **Name-conflict** → **CHALLENGE**, tier-1 stakes (it affects which skill actually runs when invoked).
 - **Trigger-overlap** → **CHALLENGE**, minor tier unless one of the pair is safety-relevant: "these two descriptions plausibly fire on the same request — differentiate, merge, or intentional?"
 
-The suite's own two skills (`claudemd-tidy`, `claudemd-tidy-reflect`) remain excluded as **edit targets**, but participate as **comparison references** — a third-party skill that duplicates one of them should be flagged, with the finding landing on the non-suite copy.
+The suite's own two skills (`claudemd-tidy`, `claudemd-tidy-reflect`) remain excluded as **edit targets**, but participate as **comparison references** — a third-party skill that duplicates one of them should be flagged, with the finding landing on the non-suite copy. Note the location implication: the suite's skills live at `${CLAUDE_PLUGIN_ROOT}/skills/`, *not* in the sweep's scan locations, so the sweep must explicitly read them from the plugin root for comparison purposes only — they are never hashed into the findings as removable copies. When both members of a flagged pair are third-party, the CHALLENGE covers the pair jointly (no "which file carries the finding" rule needed — the user's resolution names the survivor).
 
 ### Report mode
 
@@ -64,3 +66,4 @@ Build a disposable fixture repo (scratchpad) with a skills directory containing:
 ## Iteration log
 
 - 2026-07-09 — preliminary draft (pass 0), pre-review.
+- 2026-07-09 — pass 1: 1 HIGH (Name-conflict rationale corrected — Claude Code already disambiguates nested/plugin name clashes, so the check now targets the two real shapes: frontmatter-name≠dirname collisions and cross-scope shadowing, with the Frontmatter-sane? interplay spelled out), 2 MEDIUM (suite-skills-as-references now states they're read from `${CLAUDE_PLUGIN_ROOT}`, never hashed as removable; placement decided — full spec in the class table's Skills row, Step 2 gets a one-line pointer), 5 LOW (N²-prefilter wording, malformed-frontmatter skip rule, `--all` composition, line-based waste figure made consistent, hash- not grep-confirmable).
