@@ -1,8 +1,13 @@
-# Changelog — TidyClaudeMD
+# Changelog — ClaudeCodeTidy
 
-All notable changes to the suite (`claudemd-tidy` + `claudemd-tidy-reflect`). Follows semantic versioning; one version for the whole suite. Entries produced by the self-improvement loop cite the run record that motivated them as `(run: YYYY-MM-DD <repo>)`.
+All notable changes to the suite (`groom` + `learn`). Follows semantic versioning; one version for the whole suite. Entries produced by the self-improvement loop cite the run record that motivated them as `(run: YYYY-MM-DD <repo>)`.
 
 ## [Unreleased]
+
+## [1.0.0] — 2026-07-09
+
+### Changed
+- **Project renamed TidyClaudeMD → ClaudeCodeTidy** (repo, plugin namespace `tidyclaudemd` → `claudecodetidy`, GitHub `lucagattoni/TidyClaudeMD` → `lucagattoni/ClaudeCodeTidy`) — the scope grew from one file (`CLAUDE.md`) to the whole Claude Code instruction surface (CLAUDE.md, rules, skills, memory), and the old name no longer described what the tool does; the new name states both the product (Claude Code) and the activity (tidy) without repetition against the command names. Skills renamed to match — `claudemd-tidy` → `groom` (`/claudecodetidy:groom`), `claudemd-tidy-reflect` → `learn` (`/claudecodetidy:learn`) — dropping the redundant "tidy" from the invocation and using verbs the skill descriptions already used internally. Breaking change to the install/CLI contract: existing installs must `/plugin marketplace add lucagattoni/ClaudeCodeTidy` + `/plugin install claudecodetidy@ClaudeCodeTidy` again; old invocations (`/tidyclaudemd:claudemd-tidy`, `/tidyclaudemd:claudemd-tidy-reflect`) no longer resolve (user directive 2026-07-09).
 
 ## [0.21.0] — 2026-07-09
 

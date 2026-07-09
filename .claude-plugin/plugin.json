@@ -1,11 +1,11 @@
 {
-  "name": "tidyclaudemd",
+  "name": "claudecodetidy",
   "description": "Self-improving Claude Code skills that keep the whole Claude Code instruction surface — CLAUDE.md, rules, skills, memory — slim without losing information",
-  "version": "0.21.0",
+  "version": "1.0.0",
   "author": {
     "name": "Luca Gattoni"
   },
-  "homepage": "https://github.com/lucagattoni/TidyClaudeMD",
-  "repository": "https://github.com/lucagattoni/TidyClaudeMD",
+  "homepage": "https://github.com/lucagattoni/ClaudeCodeTidy",
+  "repository": "https://github.com/lucagattoni/ClaudeCodeTidy",
   "license": "MIT"
 }

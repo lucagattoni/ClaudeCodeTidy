@@ -1,4 +1,4 @@
-# TidyClaudeMD — reference manual
+# ClaudeCodeTidy — reference manual
 
 Everything the two skills do, in detail. New to Claude Code file types? Start with [claude-code-concepts.md](claude-code-concepts.md). For the short pitch and install steps, see the [README](../README.md).
 
@@ -32,7 +32,7 @@ Report mode (`--report`) is a cheap shortcut that runs phase 1 only, then a shal
 
 ## Target classes
 
-TidyClaudeMD doesn't only tidy project `CLAUDE.md` files. Pass a flag to target a different class:
+ClaudeCodeTidy doesn't only tidy project `CLAUDE.md` files. Pass a flag to target a different class:
 
 | Class | Flag | What it covers | Notable behavior |
 |---|---|---|---|
@@ -115,7 +115,7 @@ These logs are the training data for the reflect skill.
 
 ## The reflect skill
 
-`/tidyclaudemd:claudemd-tidy-reflect` learns from real runs and improves `claudemd-tidy` itself. Its one rule: **no evidence, no change** — it never invents an improvement from first principles.
+`/claudecodetidy:learn` learns from real runs and improves `groom` itself. Its one rule: **no evidence, no change** — it never invents an improvement from first principles.
 
 **Where evidence comes from:**
 - Every run log not yet marked `Processed: yes`.
@@ -130,8 +130,8 @@ These logs are the training data for the reflect skill.
 
 | Kind of lesson | Goes to |
 |---|---|
-| Tidy mechanics (scanning, verdicts, apply order, recording) | `claudemd-tidy/SKILL.md` |
-| Reflection mechanics (this skill's own workflow) | `claudemd-tidy-reflect/SKILL.md` — the loop applies to itself |
+| Tidy mechanics (scanning, verdicts, apply order, recording) | `groom/SKILL.md` |
+| Reflection mechanics (this skill's own workflow) | `learn/SKILL.md` — the loop applies to itself |
 | What counts as good CLAUDE.md content | The global hygiene rules in `~/.claude/CLAUDE.md` — proposed to you, never forked into the skill |
 | A repo-specific quirk | That repo's own CLAUDE.md, suggested to you — never folded into the general skill |
 
@@ -154,7 +154,7 @@ Self-improvement can never remove or weaken these autonomously — any lesson to
 
 ## Optional companion hook
 
-`claudemd-tidy` only runs when you invoke it, so nothing notices a CLAUDE.md crossing the ~150-line hygiene guardrail *between* runs. A deterministic hard cap would fight against the judgment-driven verdicts above, so instead here's an optional, purely advisory `PostToolUse` hook that just reminds you:
+`groom` only runs when you invoke it, so nothing notices a CLAUDE.md crossing the ~150-line hygiene guardrail *between* runs. A deterministic hard cap would fight against the judgment-driven verdicts above, so instead here's an optional, purely advisory `PostToolUse` hook that just reminds you:
 
 ```json
 {
@@ -165,7 +165,7 @@ Self-improvement can never remove or weaken these autonomously — any lesson to
         "hooks": [
           {
             "type": "command",
-            "command": "f=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; case \"$f\" in *CLAUDE.md) n=$(wc -l < \"$f\"); if [ \"$n\" -gt 150 ]; then echo \"$f is now $n lines (> the ~150-line hygiene guardrail) — consider running /tidyclaudemd:claudemd-tidy\" >&2; fi ;; esac"
+            "command": "f=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; case \"$f\" in *CLAUDE.md) n=$(wc -l < \"$f\"); if [ \"$n\" -gt 150 ]; then echo \"$f is now $n lines (> the ~150-line hygiene guardrail) — consider running /claudecodetidy:groom\" >&2; fi ;; esac"
           }
         ]
       }

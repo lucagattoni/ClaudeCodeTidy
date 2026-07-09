@@ -1,12 +1,12 @@
 ---
-name: claudemd-tidy-reflect
-description: Self-improvement loop for TidyClaudeMD. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on claudemd-tidy.
-version: 0.21.0
+name: learn
+description: Self-improvement loop for ClaudeCodeTidy. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on groom.
+version: 1.0.0
 ---
 
-# /tidyclaudemd:claudemd-tidy-reflect
+# /claudecodetidy:learn
 
-Learn from concrete tidy experience and fold the lessons back into `${CLAUDE_PLUGIN_ROOT}/skills/claudemd-tidy/SKILL.md`. **Every change must be traceable to evidence from a real run or instance — no evidence, no change.**
+Learn from concrete tidy experience and fold the lessons back into `${CLAUDE_PLUGIN_ROOT}/skills/groom/SKILL.md`. **Every change must be traceable to evidence from a real run or instance — no evidence, no change.**
 
 ## Argument
 
@@ -14,7 +14,7 @@ Optional: a path to a specific CLAUDE.md to study as a fresh instance (analysis 
 
 ## Step 0 — Load the suite
 
-Read all of: `${CLAUDE_PLUGIN_ROOT}/skills/claudemd-tidy/SKILL.md`, this skill's own `SKILL.md`, `${CLAUDE_PLUGIN_ROOT}/README.md`, `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`, every log in `${CLAUDE_PLUGIN_DATA}/RUNS-archive/`, and the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md`. Note the current suite version.
+Read all of: `${CLAUDE_PLUGIN_ROOT}/skills/groom/SKILL.md`, this skill's own `SKILL.md`, `${CLAUDE_PLUGIN_ROOT}/README.md`, `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`, every log in `${CLAUDE_PLUGIN_DATA}/RUNS-archive/`, and the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md`. Note the current suite version.
 
 ## Step 1 — Gather evidence
 
@@ -35,7 +35,7 @@ Mine the evidence for signals, strongest first:
 3. **The skill had to ask a question** the instructions should have answered → a gap to close.
 4. **Apply-phase friction or error** (blocked command, missing destination, sync conflict) → a preflight or apply step to harden.
 5. **Content that fit no verdict or no destination** → the taxonomy needs extending.
-6. **An existing instruction in `claudemd-tidy/SKILL.md` never triggered across the processed run logs** — never cited as the reason a CHALLENGE/DELETE/RELOCATE fired, never referenced in feedback — is a **pruning candidate**. Requires the same evidence discipline as an addition: cite which logs were checked and found the instruction inert before proposing its removal in Step 5. For a class-specific instruction (skills/memory/user-level tests), only runs whose **Target classes** field covers that class count as evidence either way — a memory test can't be judged inert from CLAUDE.md-only runs.
+6. **An existing instruction in `groom/SKILL.md` never triggered across the processed run logs** — never cited as the reason a CHALLENGE/DELETE/RELOCATE fired, never referenced in feedback — is a **pruning candidate**. Requires the same evidence discipline as an addition: cite which logs were checked and found the instruction inert before proposing its removal in Step 5. For a class-specific instruction (skills/memory/user-level tests), only runs whose **Target classes** field covers that class count as evidence either way — a memory test can't be judged inert from CLAUDE.md-only runs.
 
 Each candidate lesson must pass all three tests, or be discarded (and reported as discarded, with the reason):
 - **Generalizable** — would improve tidy runs in *other* repos, not just this one.
@@ -44,7 +44,7 @@ Each candidate lesson must pass all three tests, or be discarded (and reported a
 
 ## Step 3 — Route each lesson to its home
 
-- **Tidy mechanics** (scanning, verdict tests, apply order, recording) → `claudemd-tidy/SKILL.md`.
+- **Tidy mechanics** (scanning, verdict tests, apply order, recording) → `groom/SKILL.md`.
 - **Reflection mechanics** (evidence gathering, lesson tests, this workflow) → this skill's own `SKILL.md` — the loop applies to itself.
 - **What "good CLAUDE.md content" means** (the hygiene rules themselves) → the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md`. Never fork a private copy of those rules into the skill; propose the global edit and get explicit user confirmation, since that rulebook governs every session.
 - **Repo-specific quirks** → that repo's own CLAUDE.md (suggest it to the user); never encode them into the general skill.
@@ -55,7 +55,7 @@ These invariants (documented in `README.md` → Invariants) may **never be weake
 
 ## Step 5 — Apply
 
-1. Edit the routed file(s) with **minimal diffs** — surgical insertions/rewrites, each mapped to one lesson. A **pruning** lesson (Step 2, signal 6) removes the inert instruction from `claudemd-tidy/SKILL.md` the same way an addition inserts one — cite the checked logs in the CHANGELOG entry (sub-step 3).
+1. Edit the routed file(s) with **minimal diffs** — surgical insertions/rewrites, each mapped to one lesson. A **pruning** lesson (Step 2, signal 6) removes the inert instruction from `groom/SKILL.md` the same way an addition inserts one — cite the checked logs in the CHANGELOG entry (sub-step 3).
 2. **Bump the suite version** (one semver for the whole suite, kept identical in both skills' frontmatter):
    - **PATCH** — clarified wording, tightened an existing test, fixed a record format.
    - **MINOR** — new step, new verdict, new signal, new capability.

@@ -1,19 +1,19 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "tidyclaudemd",
+  "name": "claudecodetidy",
   "description": "Self-improving Claude Code skills that keep every repo's CLAUDE.md slim without losing information",
   "owner": {
     "name": "Luca Gattoni"
   },
   "plugins": [
     {
-      "name": "tidyclaudemd",
+      "name": "claudecodetidy",
       "description": "Self-improving Claude Code skills that keep every repo's CLAUDE.md slim without losing information",
       "author": {
         "name": "Luca Gattoni"
       },
       "source": ".",
-      "homepage": "https://github.com/lucagattoni/TidyClaudeMD"
+      "homepage": "https://github.com/lucagattoni/ClaudeCodeTidy"
     }
   ]
 }

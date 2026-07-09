@@ -1,10 +1,10 @@
 ---
-name: claudemd-tidy
+name: groom
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 0.21.0
+version: 1.0.0
 ---
 
-# /tidyclaudemd:claudemd-tidy
+# /claudecodetidy:groom
 
 Audit and slim Claude Code instruction files — project CLAUDE.md by default; user-level files, skills, and memory via the class flags below. Two phases: **analyze & propose** (always), then **apply** — autonomously for reversibility-protected targets, after confirmation for everything else (the gate in Step 4).
 
@@ -34,7 +34,7 @@ A report-only run still writes a Step 7 run log (tag it analyze-only in the Resu
 
 ## Step 0 — Preflight
 
-1. **Version-currency check.** Read `~/.claude/plugins/installed_plugins.json` and find this plugin's pinned version (`plugins["tidyclaudemd@tidyclaudemd"][0].version`). Compare it to this file's own frontmatter `version:`. If they differ, this session is executing stale, cached skill instructions — **stop before Step 1** and tell the user: run `/plugin update tidyclaudemd` if not already done, then **restart the Claude Code session** (`/reload-plugins` mid-session updates the plugin registry but does not swap in new skill content for the running session — confirmed by direct observation, 2026-07-08). If the two versions match, proceed normally.
+1. **Version-currency check.** Read `~/.claude/plugins/installed_plugins.json` and find this plugin's pinned version (`plugins["claudecodetidy@claudecodetidy"][0].version`). Compare it to this file's own frontmatter `version:`. If they differ, this session is executing stale, cached skill instructions — **stop before Step 1** and tell the user: run `/plugin update claudecodetidy` if not already done, then **restart the Claude Code session** (`/reload-plugins` mid-session updates the plugin registry but does not swap in new skill content for the running session — confirmed by direct observation, 2026-07-08). If the two versions match, proceed normally.
 2. Confirm you are inside a git repo; if not, ask which file to tidy and skip git steps.
 3. Sync per the global working defaults: `git fetch`, check branch/ahead-behind/dirty state.
 4. Check repo visibility (`gh repo view --json visibility` or inspect the remote). If public or unknown → the **PRIMARY CHECK** in `~/.claude/CLAUDE.md` applies to every file this skill writes, including relocated content.
@@ -153,7 +153,7 @@ Final summary: per file, before → after line counts, blocks relocated (with de
 Write **one new file per run** to `${CLAUDE_PLUGIN_DATA}/RUNS-archive/` (create the directory if missing) — never append to a shared file; every run gets its own permanent, standalone log. Name it `<YYYYMMDD>-<HHMM>-<target>.log` in local date/time, where `<target>` is `user` for a run scoped to `~/.claude`, or the target repo's directory basename otherwise (sanitize to `[A-Za-z0-9_-]`, e.g. `job2026`, `Claude-Warp`). On a same-minute, same-target collision, append `-2`, `-3`, ....
 
 ```markdown
-# claudemd-tidy — run log
+# groom — run log
 
 - **Date/time:** YYYY-MM-DD HH:MM
 - **Target:** <repo name, or "user"> — `<absolute path to the repo root, or ~/.claude>`
@@ -162,7 +162,7 @@ Write **one new file per run** to `${CLAUDE_PLUGIN_DATA}/RUNS-archive/` (create 
 - **Memory snapshot:** <path, if a memory edit happened — or "n/a">
 - **Commit(s):** <the SHA(s) this run produced — one per apply iteration per the reversibility gate, oldest first — or "n/a — no changes applied" / "n/a — run aborted before any edit">
 - **Result:** <before> → <after> lines · <n> relocated · <n> compressed · <n> deleted · <n> challenged (or "analyze-only, not applied")
-- **Instructions exercised:** <for each non-KEEP verdict and each CHALLENGE, the SKILL.md step or test that produced it (e.g. "RELOCATE: Step 3 verdict table", "CHALLENGE: Step 2b Consistent?") — or "none (analyze-only found nothing to act on)". This is what lets `/tidyclaudemd:claudemd-tidy-reflect` later tell which instructions are pulling weight across runs and which never fire.>
+- **Instructions exercised:** <for each non-KEEP verdict and each CHALLENGE, the SKILL.md step or test that produced it (e.g. "RELOCATE: Step 3 verdict table", "CHALLENGE: Step 2b Consistent?") — or "none (analyze-only found nothing to act on)". This is what lets `/claudecodetidy:learn` later tell which instructions are pulling weight across runs and which never fire.>
 - **User feedback:** <every amendment, CHALLENGE resolution, and remark the user made, verbatim-ish, each tagged:
   `[general → suggested home: tidy skill / reflect skill / global hygiene rules]` if the lesson would
   hold in other repos, or `[repo-specific]` if it only reflects this repo's context — or "none">
@@ -173,4 +173,4 @@ Write **one new file per run** to `${CLAUDE_PLUGIN_DATA}/RUNS-archive/` (create 
 
 Assess generalizability **at recording time, while the context is fresh** — the reflect skill verifies the tag but relies on this first-hand judgment. When in doubt, tag `[general?]` and let reflection decide.
 
-Be honest and specific — these logs are the training data for `/tidyclaudemd:claudemd-tidy-reflect`, which gathers evidence by scanning every `RUNS-archive/*.log` file for `**Processed:** no`. If any field is non-empty besides Result, suggest the user run `/tidyclaudemd:claudemd-tidy-reflect` to fold the lesson back into this skill.
+Be honest and specific — these logs are the training data for `/claudecodetidy:learn`, which gathers evidence by scanning every `RUNS-archive/*.log` file for `**Processed:** no`. If any field is non-empty besides Result, suggest the user run `/claudecodetidy:learn` to fold the lesson back into this skill.

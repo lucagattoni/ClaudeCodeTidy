@@ -1,14 +1,14 @@
-# TidyClaudeMD
+# ClaudeCodeTidy
 
 Claude Code reads several kinds of instruction files before it does anything else: your project's `CLAUDE.md`, custom `.claude/rules/`, `SKILL.md` procedures, and its own memory notes. As a project matures, these files accumulate — rules get duplicated across files, drift out of date, or grow past the length Claude actually reads reliably.
 
-TidyClaudeMD is a Claude Code plugin that audits and slims these instruction files — never your actual code. It works the way you'd refactor, not just delete: content moves to its correct home, verbose rules get compressed, only confirmed-dead content is removed, and anything only you can judge is raised as a question instead of guessed at. A second skill learns from real tidy runs and improves the first — evidence-only, never a guess.
+ClaudeCodeTidy is a Claude Code plugin that audits and slims these instruction files — never your actual code. It works the way you'd refactor, not just delete: content moves to its correct home, verbose rules get compressed, only confirmed-dead content is removed, and anything only you can judge is raised as a question instead of guessed at. A second skill learns from real tidy runs and improves the first — evidence-only, never a guess.
 
-**Version 0.21.0** · [Changelog](CHANGELOG.md)
+**Version 1.0.0** · [Changelog](CHANGELOG.md)
 
 ## New to Claude Code?
 
-TidyClaudeMD assumes you already know what these files are. If you don't, here's the short version — full primer with links to Anthropic's own docs: [docs/claude-code-concepts.md](docs/claude-code-concepts.md).
+ClaudeCodeTidy assumes you already know what these files are. If you don't, here's the short version — full primer with links to Anthropic's own docs: [docs/claude-code-concepts.md](docs/claude-code-concepts.md).
 
 | File | What it is |
 |---|---|
@@ -17,24 +17,24 @@ TidyClaudeMD assumes you already know what these files are. If you don't, here's
 | `SKILL.md` (a Skill) | A packaged procedure Claude loads on demand, not every session |
 | `MEMORY.md` (auto memory) | Notes Claude writes about *itself* — learnings from past sessions, not instructions from you |
 
-## What TidyClaudeMD does
+## What ClaudeCodeTidy does
 
 Two skills, bundled as one plugin:
 
 | Skill | Purpose |
 |---|---|
-| [`/tidyclaudemd:claudemd-tidy`](skills/claudemd-tidy/SKILL.md) | Audits one of the file types above and slims it: relocate misplaced content, compress verbose content, delete only confirmed-dead content, or raise a question when only you can decide |
-| [`/tidyclaudemd:claudemd-tidy-reflect`](skills/claudemd-tidy-reflect/SKILL.md) | Learns from real tidy runs and improves the tidy skill itself — evidence-only, never guesses |
+| [`/claudecodetidy:groom`](skills/groom/SKILL.md) | Audits one of the file types above and slims it: relocate misplaced content, compress verbose content, delete only confirmed-dead content, or raise a question when only you can decide |
+| [`/claudecodetidy:learn`](skills/learn/SKILL.md) | Learns from real tidy runs and improves the tidy skill itself — evidence-only, never guesses |
 
 Every tidy run: builds a picture of your repo → questions every line against seven tests → proposes verdicts → applies them (autonomously if the file is git-tracked and every change is revertible, otherwise with your confirmation first) → writes a permanent log of what happened. Full mechanics, every test and verdict, and the six safety invariants that self-improvement can never weaken: **[docs/reference.md](docs/reference.md)**.
 
 ## Install
 
-`/tidyclaudemd:claudemd-tidy` reads its rules from a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in your **global** `~/.claude/CLAUDE.md`. **If that section doesn't exist yet, the skill bootstraps it automatically** the first time you run it: it appends [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to your global `CLAUDE.md` and tells you it did so — a one-time seed, not an ongoing copy.
+`/claudecodetidy:groom` reads its rules from a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in your **global** `~/.claude/CLAUDE.md`. **If that section doesn't exist yet, the skill bootstraps it automatically** the first time you run it: it appends [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to your global `CLAUDE.md` and tells you it did so — a one-time seed, not an ongoing copy.
 
 ```
-/plugin marketplace add lucagattoni/TidyClaudeMD
-/plugin install tidyclaudemd@TidyClaudeMD
+/plugin marketplace add lucagattoni/ClaudeCodeTidy
+/plugin install claudecodetidy@ClaudeCodeTidy
 ```
 
 Both skills are then available under their namespaced form shown in the table above. This is the only supported install path — no manual copy, no standalone script (see [`plans/plugin-packaging-plan.md`](plans/plugin-packaging-plan.md) for the full design).
@@ -46,7 +46,7 @@ Verified locally via `claude --plugin-dir` (skill loading, `--report` mode, and 
 This repo (also the plugin, and its own marketplace):
 
 ```
-TidyClaudeMD/
+ClaudeCodeTidy/
   README.md                          ← this file
   docs/                              ← detailed reference, linked from here
   CHANGELOG.md                       ← version history of the suite (semver)
@@ -56,8 +56,8 @@ TidyClaudeMD/
     plugin.json                      ← plugin manifest (name, version, license, ...)
     marketplace.json                 ← marketplace catalog (this repo lists itself)
   skills/
-    claudemd-tidy/SKILL.md           ← the tidy skill
-    claudemd-tidy-reflect/SKILL.md   ← the self-improvement skill
+    groom/SKILL.md                   ← the tidy skill
+    learn/SKILL.md                   ← the self-improvement skill
 ```
 
 Installed, this same content lives under `${CLAUDE_PLUGIN_ROOT}` (the plugin's installation directory — substituted inline wherever a skill's own instructions reference it, no hardcoded path). Persistent bookkeeping lives separately, under `${CLAUDE_PLUGIN_DATA}`, so it survives a plugin update instead of being replaced along with the bundled files:
@@ -81,7 +81,7 @@ One semver for the whole suite, kept identical in both skills' frontmatter, this
 | MINOR | New step, verdict, signal, or capability |
 | PATCH | Clarified wording, tightened an existing test, format fix |
 
-**Every bump gets a matching git tag and [GitHub release](https://github.com/lucagattoni/TidyClaudeMD/releases), published in the same pass — no exceptions, whether the bump came from the reflect loop or an ordinary session.** The CHANGELOG entry alone isn't a substitute; the release list is what a repo visitor actually sees.
+**Every bump gets a matching git tag and [GitHub release](https://github.com/lucagattoni/ClaudeCodeTidy/releases), published in the same pass — no exceptions, whether the bump came from the reflect loop or an ordinary session.** The CHANGELOG entry alone isn't a substitute; the release list is what a repo visitor actually sees.
 
 ## License
 

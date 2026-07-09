@@ -1,6 +1,6 @@
 # Claude Code file types — a primer
 
-New to Claude Code? This page explains the four kinds of files TidyClaudeMD maintains, in plain terms, before you read anything else in this repo. For the authoritative detail on any of them, follow the official docs links below — this page stays intentionally short.
+New to Claude Code? This page explains the four kinds of files ClaudeCodeTidy maintains, in plain terms, before you read anything else in this repo. For the authoritative detail on any of them, follow the official docs links below — this page stays intentionally short.
 
 ## `CLAUDE.md` — instructions you write
 
@@ -30,6 +30,6 @@ Auto memory is the one file type here Claude writes, not you. As you correct it 
 
 Official docs: [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory) (see "Auto memory")
 
-## Where TidyClaudeMD fits
+## Where ClaudeCodeTidy fits
 
-All four file types above are context Claude loads every session, or nearly every session — so they all cost tokens and get harder to maintain as they grow. TidyClaudeMD is a Claude Code plugin (two skills, described in the [README](../README.md)) that audits and slims all four, relocating content to its right home instead of just deleting it. Full mechanics: [reference.md](reference.md).
+All four file types above are context Claude loads every session, or nearly every session — so they all cost tokens and get harder to maintain as they grow. ClaudeCodeTidy is a Claude Code plugin (two skills, described in the [README](../README.md)) that audits and slims all four, relocating content to its right home instead of just deleting it. Full mechanics: [reference.md](reference.md).
