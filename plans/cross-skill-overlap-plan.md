@@ -47,14 +47,14 @@ No format change needed: sweep-level findings go under **Instructions exercised*
 
 ## Files & bump
 
-- `skills/claudemd-tidy/SKILL.md`: Step 2 — new sweep-level bullet for the `--skills` class (the four checks, mechanics, pre-filter rule); Step 3 — routing note (sweep-level CHALLENGEs, suite-skills-as-references rule); Report mode — one clause adding the mechanical trio; Target classes table — one sentence in the Skills row pointing at the sweep-level pass.
+- `skills/claudemd-tidy/SKILL.md`: Target classes table, Skills row — the full "Sweep-level checks" spec (the four checks, mechanics, pre-filter rule, suite-skills-as-references rule), per the Placement decision above; Step 2 orientation-pass bullet — the one-line pointer only; Step 3 — routing note (sweep-level CHALLENGE tiers); Report mode — one clause adding the mechanical trio.
 - `docs/reference.md`: Target classes → skills-class tests paragraph gains the sweep-level checks.
 - `README.md`: the `--skills` fragment of the Scope bullet mentions cross-skill detection.
 - `CHANGELOG.md` + version bump: **MINOR** (new capability), with git tag + GitHub release in the same pass per the v0.20.2 rule.
 
 ## Verification
 
-Build a disposable fixture repo (scratchpad) with a skills directory containing: an exact duplicate pair, a near-duplicate pair (same body, different `name:`/`description:`), a name-conflict pair (same `name:`, different bodies), one trigger-overlap pair (distinct wording, same plausible trigger), and one clean control skill. Run `--skills` against it and confirm: all four planted findings surface as CHALLENGEs with correct evidence citations, the control skill produces none, and `--report --skills` surfaces exactly the three mechanical counts. Record the run log as normal — it doubles as the first real multi-skill-class evidence for the reflect loop.
+Build a disposable fixture repo (scratchpad) with a skills directory containing: an exact duplicate pair, a near-duplicate pair (same body, different `name:`/`description:`), a name-conflict pair exercising shape (a) — the same frontmatter `name:` in two differently-named directories, different bodies — one trigger-overlap pair (distinct wording, same plausible trigger), and one clean control skill. Run `--skills` against it and confirm: all four planted findings surface as CHALLENGEs with correct evidence citations, the control skill produces none, and `--report --skills` surfaces exactly the three mechanical counts. Record the run log as normal — it doubles as the first real multi-skill-class evidence for the reflect loop.
 
 ## What this plan does not decide
 
@@ -66,4 +66,5 @@ Build a disposable fixture repo (scratchpad) with a skills directory containing:
 ## Iteration log
 
 - 2026-07-09 — preliminary draft (pass 0), pre-review.
+- 2026-07-09 — pass 2: 1 HIGH (Files & bump section still described the pre-pass-1, inverted placement — Step 2 carrying the full spec — contradicting the Placement decision; now matches it), 1 LOW (verification fixture's name-conflict pair now specifies shape (a) so it exercises a genuinely possible collision).
 - 2026-07-09 — pass 1: 1 HIGH (Name-conflict rationale corrected — Claude Code already disambiguates nested/plugin name clashes, so the check now targets the two real shapes: frontmatter-name≠dirname collisions and cross-scope shadowing, with the Frontmatter-sane? interplay spelled out), 2 MEDIUM (suite-skills-as-references now states they're read from `${CLAUDE_PLUGIN_ROOT}`, never hashed as removable; placement decided — full spec in the class table's Skills row, Step 2 gets a one-line pointer), 5 LOW (N²-prefilter wording, malformed-frontmatter skip rule, `--all` composition, line-based waste figure made consistent, hash- not grep-confirmable).
