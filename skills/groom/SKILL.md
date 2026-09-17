@@ -1,7 +1,7 @@
 ---
 name: groom
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # /claudecodetidy:groom
@@ -36,7 +36,7 @@ A report-only run still writes a Step 7 run log (tag it analyze-only in the Resu
 
 1. **Version-currency check.** Read `~/.claude/plugins/installed_plugins.json` and find this plugin's pinned version (`plugins["claudecodetidy@claudecodetidy"][0].version`). Compare it to this file's own frontmatter `version:`. If they differ, this session is executing stale, cached skill instructions — **stop before Step 1** and tell the user: run `/plugin update claudecodetidy` if not already done, then **restart the Claude Code session** (`/reload-plugins` mid-session updates the plugin registry but does not swap in new skill content for the running session — confirmed by direct observation, 2026-07-08). If the two versions match, proceed normally.
 2. Confirm you are inside a git repo; if not, ask which file to tidy and skip git steps.
-3. Sync per the global working defaults: `git fetch`, check branch/ahead-behind/dirty state.
+3. Sync per the global *Git and repos* rules in `~/.claude/CLAUDE.md`: `git fetch`, check branch/ahead-behind/dirty state.
 4. Check repo visibility (`gh repo view --json visibility` or inspect the remote). If public or unknown → the **PRIMARY CHECK** in `~/.claude/CLAUDE.md` applies to every file this skill writes, including relocated content.
 5. **Encryption check.** Scan for git-crypt/SOPS filters in `.gitattributes` or an `.age` key reference. If found, flag it: in Step 3, any encryption-unlock instructions in the CLAUDE.md are force-classified **KEEP** (never RELOCATE — moving them risks a chicken-and-egg lock-out); any other RELOCATE destination must be verified as covered by the same encryption scope as the source before Step 5 executes it.
 6. **CI-dependency check.** Scan CI config (`.github/workflows/` and any other CI directories at the repo root) for scripts that reference `CLAUDE.md` — or any file a CLAUDE.md imports — by filename (e.g. a script that greps its content for a required phrase). If found, flag the content those scripts appear to depend on: it's ineligible for RELOCATE in Step 5 without the user's explicit confirmation in Step 4 that the CI dependency is accounted for.

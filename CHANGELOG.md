@@ -4,6 +4,12 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-09-17
+
+### Fixed
+- **`HYGIENE-RULES-TEMPLATE.md` had drifted from the live rules it seeds.** The bundled template still carried the pre-20260915 wording of rules 3–6 and was missing rule 8 entirely, so a fresh install bootstrapped a rulebook that disagreed with the one the skill then audits against. Rule 3 now states that a line changing nothing is **deleted**, not relocated ("relocate, don't delete" grew second homes for dead content); rule 4 sends provenance to an HTML comment, which is stripped before the file reaches context; rule 5 **proposes** the prune-on-touch tidy rather than applying it, since a CLAUDE.md edit is the user's call; rule 6 adds a **~1,500-word** guardrail beside the ~150-line one and says it binds the global file too, because words are charged again in every non-fork subagent and every auto-mode classifier check. Rule 8 (periodic review, log the date) is added, citing `/claudecodetidy:groom --user --report`.
+- **`skills/groom/SKILL.md` Step 0.3 pointed at a section that does not exist.** It read "Sync per the global working defaults"; the global rulebook has no such heading — the rules live under *Git and repos*. Now named explicitly, with the file it lives in.
+
 ## [1.0.0] — 2026-07-09
 
 ### Changed
