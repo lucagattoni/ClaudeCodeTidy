@@ -1,7 +1,7 @@
 {
   "name": "claudecodetidy",
   "description": "Self-improving Claude Code skills that keep the whole Claude Code instruction surface — CLAUDE.md, rules, skills, memory — slim without losing information",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Luca Gattoni"
   },

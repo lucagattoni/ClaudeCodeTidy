@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Self-improvement loop for ClaudeCodeTidy. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on groom.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # /claudecodetidy:learn
