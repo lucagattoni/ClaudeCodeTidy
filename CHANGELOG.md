@@ -4,6 +4,11 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.0.2] — 2026-09-30
+
+### Fixed
+- **`HYGIENE-RULES-TEMPLATE.md` rules 4 and 6 claimed every HTML comment is stripped from context.** Claude Code strips only *block-level* comments (a `<!-- -->` on its own line); a comment appended to the end of a rule's line is injected like the rule text. Measured on a real global CLAUDE.md: every end-of-line comment appeared in the injected context and every own-line comment was absent — 344 words of "free" provenance were loading into every session. Rule 4 now sends provenance to a comment **on its own line** and says why; rule 6 counts words with own-line comments excluded and inline ones included, and says the file loads into *most* subagents (the built-in Explore and Plan agents skip CLAUDE.md).
+
 ## [1.0.1] — 2026-09-17
 
 ### Fixed
