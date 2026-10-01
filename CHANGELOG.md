@@ -4,6 +4,17 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.1.0] — 20261001 13:54
+
+### Changed
+- **The hygiene rules now live in a path-scoped rules file, `~/.claude/rules/claude-md-hygiene.md`, instead of a section of `~/.claude/CLAUDE.md`** (explicit user approval, 2026-10-01 — invariant 5's source changes). A rules file with `paths:` frontmatter loads only when a CLAUDE.md is read, so the eight rules stop costing context in every session (about 540 est. tokens in the author's own file); the `CLAUDE.md` keeps the section heading and a one-line pointer. `groom` Step 1 reads the rules file first, falls back to the `## CLAUDE.md hygiene` section of `~/.claude/CLAUDE.md` (the 1.0.x layout keeps working), and bootstraps a setup that has neither into the rules file — never into `CLAUDE.md`. `HYGIENE-RULES-TEMPLATE.md` is now the rules-file form, with `paths:` frontmatter. `learn` (the suite it loads and where it routes lessons), the README Install section and file layout, and `docs/reference.md` (step 2, the sources table, invariant 5) follow.
+
+### Fixed
+- **`skills/learn/SKILL.md` Step 4 pointed at a README "Invariants" section that does not exist.** The invariants are in `docs/reference.md`; both pointers now say so.
+- **The README header still said `Version 1.0.0`**, stale since 1.0.1, although the Versioning section says the header carries the suite version.
+
+**Bump note:** moving the rules' home is arguably a MAJOR "file layout" change by this suite's own table. Applied as MINOR 1.1.0 because it is backward compatible — a 1.0.x layout keeps working through the fallback in Step 1 — and because the user approved both the change and its version on 2026-10-01.
+
 ## [1.0.2] — 2026-09-30
 
 ### Fixed

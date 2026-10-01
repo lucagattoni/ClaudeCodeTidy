@@ -20,7 +20,7 @@ Every run — whatever target class it covers — goes through the same eight ph
 | # | Phase | What happens |
 |---|---|---|
 | 1 | Preflight | Checks the session isn't running a stale plugin version, syncs git, checks repo visibility and encryption/CI dependencies. See [Preflight checks](#preflight-checks). |
-| 2 | Load the rules | Reads the hygiene rules from your global `~/.claude/CLAUDE.md` — the skill has no rules baked into itself. |
+| 2 | Load the rules | Reads the hygiene rules from your global rules file `~/.claude/rules/claude-md-hygiene.md` (falling back to the `CLAUDE.md hygiene` section of `~/.claude/CLAUDE.md`) — the skill has no rules baked into itself. |
 | 3 | Build a repo picture | A cheap orientation pass plus targeted verification of only the concrete claims the target file makes — never an open-ended read of the whole repo. |
 | 4 | Interrogate every line | Each line is checked against seven tests. See [The seven interrogation tests](#the-seven-interrogation-tests). |
 | 5 | Assign a verdict | Each block gets exactly one of five verdicts. See [The five verdicts](#the-five-verdicts). |
@@ -132,7 +132,7 @@ These logs are the training data for the reflect skill.
 |---|---|
 | Tidy mechanics (scanning, verdicts, apply order, recording) | `groom/SKILL.md` |
 | Reflection mechanics (this skill's own workflow) | `learn/SKILL.md` — the loop applies to itself |
-| What counts as good CLAUDE.md content | The global hygiene rules in `~/.claude/CLAUDE.md` — proposed to you, never forked into the skill |
+| What counts as good CLAUDE.md content | The global hygiene rules in `~/.claude/rules/claude-md-hygiene.md` — proposed to you, never forked into the skill |
 | A repo-specific quirk | That repo's own CLAUDE.md, suggested to you — never folded into the general skill |
 
 **Provisional lessons.** A lesson drawn from a single log is applied but marked provisional. A second, independent run that corroborates it promotes the lesson (the tag is dropped, both logs cited); a contradicting run demotes or revisits it. This keeps one-off feedback from getting baked permanently into a suite meant to work across arbitrary repos.
@@ -149,7 +149,7 @@ Self-improvement can never remove or weaken these autonomously — any lesson to
 2. **No-loss guarantee** — slimming relocates content; nothing is ever lost.
 3. **Evidence before DELETE** — every deletion cites a located duplicate or a verified-gone reference.
 4. **PRIMARY CHECK** — public or unknown-visibility repos get the sensitive-content gate on every file this skill writes.
-5. **Single-sourced rules at runtime** — the skill reads hygiene rules only from your global `~/.claude/CLAUDE.md`, never a private copy. *(The one-time bootstrap template is a seed, not an exception — user decision, 2026-07-03.)*
+5. **Single-sourced rules at runtime** — the skill reads hygiene rules only from your global rules file `~/.claude/rules/claude-md-hygiene.md` (or, if that file doesn't exist, the `CLAUDE.md hygiene` section of `~/.claude/CLAUDE.md`), never a private copy. *(The one-time bootstrap template is a seed, not an exception — user decision, 2026-07-03; it is copied into the rules file, never into a CLAUDE.md. The rules' home moved from `~/.claude/CLAUDE.md` to the rules file in 1.1.0 — user approval, 2026-10-01.)*
 6. **No evidence, no change** — the reflect skill never improvises.
 
 ## Optional companion hook

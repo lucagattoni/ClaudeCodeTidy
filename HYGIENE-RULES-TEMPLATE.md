@@ -1,3 +1,10 @@
+---
+paths:
+  - "**/CLAUDE.md"
+  - "**/CLAUDE.local.md"
+  - "**/AGENTS.md"
+---
+
 ## CLAUDE.md hygiene — keep every CLAUDE.md slim
 
 Applies to **every** `CLAUDE.md` I create or edit (global, project, nested). A CLAUDE.md is a rulebook loaded into context on every session — each line costs attention, so it must earn its place. Slim it without losing content (rule 3 names the exceptions).

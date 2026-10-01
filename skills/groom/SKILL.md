@@ -1,7 +1,7 @@
 ---
 name: groom
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 1.0.2
+version: 1.1.0
 ---
 
 # /claudecodetidy:groom
@@ -59,11 +59,11 @@ A report-only run still writes a Step 7 run log (tag it analyze-only in the Resu
 
 ## Step 1 — Load the rules
 
-Read the **"CLAUDE.md hygiene — keep every CLAUDE.md slim"** section of `~/.claude/CLAUDE.md`. Those numbered rules are the single source of truth for this skill — do not work from memory of them.
+Read `~/.claude/rules/claude-md-hygiene.md` (a path-scoped rule file; ignore its `paths:` frontmatter). Its numbered rules, under the heading **"CLAUDE.md hygiene — keep every CLAUDE.md slim"**, are the single source of truth for this skill — do not work from memory of them. **If that file doesn't exist**, read the section of the same name in `~/.claude/CLAUDE.md` instead (the layout up to 1.0.x) — but only if it holds the numbered rules; a section that is just a one-line pointer to the rules file holds none. If both hold the rules, the rules file wins, and the duplicate section is a finding (one home per rule) — report it in Step 6, and as a CHALLENGE on a `--user` run.
 
-**If the section is missing** (first-time setup): append the contents of `${CLAUDE_PLUGIN_ROOT}/HYGIENE-RULES-TEMPLATE.md` verbatim to the end of `~/.claude/CLAUDE.md` as a new section — do not overwrite or reorder anything already in that file. Tell the user you did this and why. This is a **one-time bootstrap**: from this point on, `~/.claude/CLAUDE.md` is the sole source of truth, exactly as if the section had always been there — this skill never reads the bundled template again after the first install, and the reflect skill only ever proposes edits to the global file, never to the template.
+**If neither holds the rules** (first-time setup, or a pointer-only section whose rules file was deleted): copy `${CLAUDE_PLUGIN_ROOT}/HYGIENE-RULES-TEMPLATE.md` verbatim to `~/.claude/rules/claude-md-hygiene.md`, creating `~/.claude/rules/` if needed — never into a CLAUDE.md, and never over an existing file. Tell the user you did this and why. This is a **one-time bootstrap**: from this point on, the rules file is the sole source of truth, exactly as if it had always been there — this skill never reads the bundled template again after the first install, and the reflect skill only ever proposes edits to the rules file, never to the template.
 
-Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded scope, not just the hygiene section) — needed for Step 2b's **Redundant-by-order?** question, which can't be answered from the hygiene section alone. If the global file itself contains live `@imports`, read those too: the redundancy comparison must see the global file's *effective* content, not just its literal text. Read every other earlier-loaded scope that exists on this machine as well: `~/.claude/rules/*.md` (user rules load before all project files) and a managed-policy CLAUDE.md if present (macOS `/Library/Application Support/ClaudeCode/CLAUDE.md`, Linux/WSL `/etc/claude-code/CLAUDE.md`, or a `claudeMd` key in managed settings) — Redundant-by-order can't be answered without them. (**Project** `.claude/rules/` files load *after* the project CLAUDE.md, so they are not earlier-loaded for its lines — overlap with them is handled in Step 2b/Step 3, not here.)
+Also read the **rest** of `~/.claude/CLAUDE.md` in full (every earlier-loaded scope, not just the hygiene rules) — needed for Step 2b's **Redundant-by-order?** question, which can't be answered from the hygiene rules alone. If the global file itself contains live `@imports`, read those too: the redundancy comparison must see the global file's *effective* content, not just its literal text. Read every other earlier-loaded scope that exists on this machine as well: `~/.claude/rules/*.md` (user rules load before all project files) and a managed-policy CLAUDE.md if present (macOS `/Library/Application Support/ClaudeCode/CLAUDE.md`, Linux/WSL `/etc/claude-code/CLAUDE.md`, or a `claudeMd` key in managed settings) — Redundant-by-order can't be answered without them. (**Project** `.claude/rules/` files load *after* the project CLAUDE.md, so they are not earlier-loaded for its lines — overlap with them is handled in Step 2b/Step 3, not here.)
 
 ## Step 2 — Build a complete picture of the repo
 

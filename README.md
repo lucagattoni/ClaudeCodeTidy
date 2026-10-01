@@ -4,7 +4,7 @@ Claude Code reads several kinds of instruction files before it does anything els
 
 ClaudeCodeTidy is a Claude Code plugin that audits and slims these instruction files — never your actual code. It works the way you'd refactor, not just delete: content moves to its correct home, verbose rules get compressed, only confirmed-dead content is removed, and anything only you can judge is raised as a question instead of guessed at. A second skill learns from real tidy runs and improves the first — evidence-only, never a guess.
 
-**Version 1.0.0** · [Changelog](CHANGELOG.md)
+**Version 1.1.0** · [Changelog](CHANGELOG.md)
 
 ## New to Claude Code?
 
@@ -30,7 +30,7 @@ Every tidy run: builds a picture of your repo → questions every line against s
 
 ## Install
 
-`/claudecodetidy:groom` reads its rules from a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in your **global** `~/.claude/CLAUDE.md`. **If that section doesn't exist yet, the skill bootstraps it automatically** the first time you run it: it appends [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to your global `CLAUDE.md` and tells you it did so — a one-time seed, not an ongoing copy.
+`/claudecodetidy:groom` reads its rules from `~/.claude/rules/claude-md-hygiene.md` — a path-scoped rule file in your **global** Claude directory that loads by itself whenever a CLAUDE.md is read, so it costs no context in other sessions. Setups that still keep the rules as a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in `~/.claude/CLAUDE.md` keep working: `groom` falls back to that section. **If neither exists yet, the skill bootstraps the rules file automatically** the first time you run it: it copies [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to `~/.claude/rules/claude-md-hygiene.md` (never into a CLAUDE.md) and tells you it did so — a one-time seed, not an ongoing copy.
 
 ```
 /plugin marketplace add lucagattoni/ClaudeCodeTidy
@@ -51,7 +51,7 @@ ClaudeCodeTidy/
   docs/                              ← detailed reference, linked from here
   CHANGELOG.md                       ← version history of the suite (semver)
   LICENSE                            ← MIT
-  HYGIENE-RULES-TEMPLATE.md          ← one-time bootstrap seed for ~/.claude/CLAUDE.md (see Install)
+  HYGIENE-RULES-TEMPLATE.md          ← one-time bootstrap seed for ~/.claude/rules/claude-md-hygiene.md (see Install)
   .claude-plugin/
     plugin.json                      ← plugin manifest (name, version, license, ...)
     marketplace.json                 ← marketplace catalog (this repo lists itself)
