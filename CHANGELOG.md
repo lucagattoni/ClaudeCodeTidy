@@ -4,6 +4,11 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.1.1] — 20261001 14:04
+
+### Fixed
+- **README Install said the rules file "loads by itself whenever a CLAUDE.md is read".** Probed 2026-10-01 in fresh headless sessions: it loads after a CLAUDE.md *inside the current project* is read, and not for one outside it, such as `~/.claude/CLAUDE.md` read from another project. The README now says so and recommends a one-line pointer to the rules file in the global CLAUDE.md. `groom` is unaffected: it reads the rules file directly.
+
 ## [1.1.0] — 20261001 13:54
 
 ### Changed
