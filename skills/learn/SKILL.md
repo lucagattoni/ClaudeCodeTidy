@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Self-improvement loop for ClaudeCodeTidy. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on groom.
-version: 1.0.2
+version: 1.1.0
 ---
 
 # /claudecodetidy:learn
@@ -14,7 +14,7 @@ Optional: a path to a specific CLAUDE.md to study as a fresh instance (analysis 
 
 ## Step 0 — Load the suite
 
-Read all of: `${CLAUDE_PLUGIN_ROOT}/skills/groom/SKILL.md`, this skill's own `SKILL.md`, `${CLAUDE_PLUGIN_ROOT}/README.md`, `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`, every log in `${CLAUDE_PLUGIN_DATA}/RUNS-archive/`, and the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md`. Note the current suite version.
+Read all of: `${CLAUDE_PLUGIN_ROOT}/skills/groom/SKILL.md`, this skill's own `SKILL.md`, `${CLAUDE_PLUGIN_ROOT}/README.md`, `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`, every log in `${CLAUDE_PLUGIN_DATA}/RUNS-archive/`, and the hygiene rules (`~/.claude/rules/claude-md-hygiene.md`, or the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md` on a 1.0.x layout). Note the current suite version.
 
 ## Step 1 — Gather evidence
 
@@ -46,12 +46,12 @@ Each candidate lesson must pass all three tests, or be discarded (and reported a
 
 - **Tidy mechanics** (scanning, verdict tests, apply order, recording) → `groom/SKILL.md`.
 - **Reflection mechanics** (evidence gathering, lesson tests, this workflow) → this skill's own `SKILL.md` — the loop applies to itself.
-- **What "good CLAUDE.md content" means** (the hygiene rules themselves) → the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md`. Never fork a private copy of those rules into the skill; propose the global edit and get explicit user confirmation, since that rulebook governs every session.
+- **What "good CLAUDE.md content" means** (the hygiene rules themselves) → `~/.claude/rules/claude-md-hygiene.md` (on a 1.0.x layout, the "CLAUDE.md hygiene" section of `~/.claude/CLAUDE.md`). Never fork a private copy of those rules into the skill; propose the global edit and get explicit user confirmation, since that rulebook governs every session.
 - **Repo-specific quirks** → that repo's own CLAUDE.md (suggest it to the user); never encode them into the general skill.
 
 ## Step 4 — Invariant gate
 
-These invariants (documented in `README.md` → Invariants) may **never be weakened or removed autonomously**: the Step-4 reversibility gate (autonomous edits only with per-iteration revertibility; confirm-first otherwise; user-only decisions always stop), the no-loss guarantee, evidence-before-DELETE, the public-repo PRIMARY CHECK, hygiene rules single-sourced at runtime in the global CLAUDE.md (the plugin's one-time bootstrap template is not an exception — see README invariant 5), and no-evidence-no-change (this skill's own). A lesson that would touch one of them is presented to the user with pros/cons and applied only on their explicit approval. Everything else may be applied autonomously.
+These invariants (documented in `docs/reference.md` → Invariants) may **never be weakened or removed autonomously**: the Step-4 reversibility gate (autonomous edits only with per-iteration revertibility; confirm-first otherwise; user-only decisions always stop), the no-loss guarantee, evidence-before-DELETE, the public-repo PRIMARY CHECK, hygiene rules single-sourced at runtime in the global rules file (the plugin's one-time bootstrap template is not an exception — see invariant 5 in `docs/reference.md`), and no-evidence-no-change (this skill's own). A lesson that would touch one of them is presented to the user with pros/cons and applied only on their explicit approval. Everything else may be applied autonomously.
 
 ## Step 5 — Apply
 
