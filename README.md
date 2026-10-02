@@ -4,7 +4,7 @@ Claude Code reads several kinds of instruction files before it does anything els
 
 ClaudeCodeTidy is a Claude Code plugin that audits and slims these instruction files — never your actual code. It works the way you'd refactor, not just delete: content moves to its correct home, verbose rules get compressed, only confirmed-dead content is removed, and anything only you can judge is raised as a question instead of guessed at. A second skill learns from real tidy runs and improves the first — evidence-only, never a guess.
 
-**Version 1.1.4** · [Changelog](CHANGELOG.md)
+**Version 1.1.5** · [Changelog](CHANGELOG.md)
 
 ## New to Claude Code?
 
@@ -39,7 +39,7 @@ Every tidy run: builds a picture of your repo → questions every line against s
 
 Both skills are then available under their namespaced form shown in the table above. This is the only supported install path — no manual copy, no standalone script (see [`plans/plugin-packaging-plan.md`](plans/plugin-packaging-plan.md) for the full design).
 
-Verified locally via `claude --plugin-dir` (skill loading, `--report` mode, and path resolution all confirmed working). **Not yet verified end-to-end via the real marketplace flow** (`/plugin marketplace add` + `/plugin install` from a genuinely separate checkout) — see the plan's phased action items for what's still open.
+Verified locally via `claude --plugin-dir` (skill loading, `--report` mode, and path resolution all confirmed working) and through the real marketplace flow on the maintainer's machine: the plugin was installed from the GitHub marketplace on 2026-09-17 and has been updated through it since (`claude plugin marketplace update`, then `claude plugin update`; 1.0.1 → 1.1.4), with `groom` running from the installed copy. **Not verified:** a first install on a machine that has never had the plugin.
 
 ## File layout
 
@@ -51,6 +51,7 @@ ClaudeCodeTidy/
   docs/                              ← detailed reference, linked from here
   CHANGELOG.md                       ← version history of the suite (semver)
   LICENSE                            ← MIT
+  plans/                             ← project history: design plans and competitor research (not used at run time)
   HYGIENE-RULES-TEMPLATE.md          ← one-time bootstrap seed for ~/.claude/rules/claude-md-hygiene.md (see Install)
   .claude-plugin/
     plugin.json                      ← plugin manifest (name, version, license, ...)

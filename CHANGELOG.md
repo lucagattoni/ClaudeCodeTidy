@@ -4,6 +4,15 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.1.5] — 20261002 14:18
+
+### Fixed
+- **README Install said the marketplace flow was "not yet verified end-to-end" and sent readers to the packaging plan for what was still open.** The maintainer's copy was installed from the GitHub marketplace on 2026-09-17 (`installedAt` in `installed_plugins.json`) and has been updated through it since (`claude plugin marketplace update`, then `claude plugin update`; 1.0.1 → 1.1.4), with `groom` running from the installed copy. The README now says so and names what is still unverified: a first install on a machine that has never had the plugin.
+- **README's file layout omitted `plans/`**, which the README itself links to (project history, not used at run time).
+- **`skills/learn/SKILL.md` Step 5.2 restated the Versioning table without the definition of a stop point**, and the reflect loop classifies its bumps from that copy. It now says MAJOR covers "this suite's own file layout" and points to README § Versioning for what counts (the follow-up named in 1.1.3).
+
+**Bump note:** PATCH (clarified wording). No step, stop point, file or behavior changes: the `learn` line only points to a definition that already exists (1.1.3).
+
 ## [1.1.4] — 20261002 14:11
 
 ### Changed

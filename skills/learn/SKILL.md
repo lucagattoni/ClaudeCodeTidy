@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Self-improvement loop for ClaudeCodeTidy. Learns from recorded tidy runs and concrete CLAUDE.md instances, then applies evidence-backed improvements to the tidy skill itself — bumping the version and CHANGELOG. Use after a tidy run surfaced friction, or when asked to improve/reflect on groom.
-version: 1.1.4
+version: 1.1.5
 ---
 
 # /claudecodetidy:learn
@@ -59,7 +59,7 @@ These invariants (documented in `docs/reference.md` → Invariants) may **never 
 2. **Bump the suite version** (one semver for the whole suite, kept identical in both skills' frontmatter):
    - **PATCH** — clarified wording, tightened an existing test, fixed a record format.
    - **MINOR** — new step, new verdict, new signal, new capability.
-   - **MAJOR** — changed workflow contract (phases, stop points, file layout). Always requires user approval, independent of the invariant gate.
+   - **MAJOR** — changed workflow contract (phases, stop points, this suite's own file layout). Always requires user approval, independent of the invariant gate. What counts as a stop point or as the suite's own file layout is defined in README § Versioning: classify from that definition, not from this line.
 3. Add a `CHANGELOG.md` entry under the new version: each change on one line, ending with its evidence citation `(run: <log filename>)`, e.g. `(run: 20260708-2327-job2026.log)`. A lesson drawn from a **single** run log is marked **provisional**: `(provisional, 1 occurrence — run: <log filename>)`. When a second, independent run corroborates a provisional lesson, promote it: rewrite the original line to drop the `provisional` tag and cite both logs, rather than adding a second line for the same lesson.
 4. **Check the README bullet for every SKILL.md step touched this pass** — not just "if a documented feature changed" (easy to judge false when the change is subtle). If the edited step has a corresponding README bullet, update it in the same diff: paraphrase behavior and intent, never restate a step's normative test or wording verbatim. Never leave `README.md` describing superseded behavior.
 5. **Mark each consumed log in place**, editing its own file in `RUNS-archive/`: `**Processed:** yes (vX.Y.Z)` — or `**Processed:** yes (vX.Y.Z, provisional)` if any lesson drawn from it was applied provisionally in sub-step 3. When a provisional lesson is later promoted, update the *originating* log's marker in place to drop `, provisional`. Logs are never deleted, moved, or batched — each stays permanently at its own path.
