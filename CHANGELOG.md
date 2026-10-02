@@ -4,6 +4,13 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.1.3] — 20261002 14:08
+
+### Changed
+- **README Versioning now says what counts as a MAJOR "stop points" or "file layout" change.** The table named both without defining them, and 1.1.0 and 1.1.2 each needed a bump note calling them "arguably MAJOR by this suite's own table". The reading the suite has applied since its plans (a stop point is where a run halts for approval before it edits; "file layout" is this suite's own layout, not where a run reads or writes in the user's directories) is now written beneath the table. No earlier classification changes: 1.1.0 stays MINOR and 1.1.2 stays PATCH.
+
+**Bump note:** PATCH (clarified wording), on the user's explicit instruction (2026-10-02). It states an existing reading; no step, stop point, file or behaviour changes.
+
 ## [1.1.2] — 20261002 13:40
 
 ### Fixed
