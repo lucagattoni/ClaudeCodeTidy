@@ -4,6 +4,15 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.1.4] — 20261002 14:11
+
+### Changed
+- **`HYGIENE-RULES-TEMPLATE.md` rule 6: ~1,500 → ~2,700 words, and "a ceiling, not a target: a new rule displaces one"**, synced to the author's live rule, which was changed on 2026-10-02 after a re-check. The old figure had no stated derivation, was already exceeded 2.25× two days after it was added and never met since, and cannot be reached by extraction alone, because the blocks without the word "never" are only about a third of the file; the Claude Code docs' only official figure is 200 lines. The new default is the author's measured calibration, not an evidence-derived optimum: edit your rules file to taste.
+- **`--report` skips Step 0.7.** The versioning check proposes a `git init`, an edit, which contradicted report mode's "no edits" (open question (b) of 1.1.2).
+- **The one-time bootstrap is recorded as an exception to Step 4's confirmation of out-of-repo writes** (`docs/reference.md` invariant 1, groom Step 1). It copies a bundled seed to a new file, autonomously and announced; if the user declined versioning at Step 0.7 it asks first. This documents existing behavior and keeps it, rather than making it confirm-first (open question (a) of 1.1.2). Both open questions were decided by the user on 2026-10-02 ("go with your recommendations").
+
+**Bump note:** PATCH, classified by the Versioning definition added in 1.1.3. The template default (what a fresh install is seeded with) and the exception note (it records behavior that already existed) are not stop-point changes. The one change that touches a stop point is `--report` skipping Step 0.7, which removes a prompt from report mode. It is classed PATCH because report mode's own definition ("no-confirmation, no-edits pre-check") already excluded that prompt, so this brings the behavior in line with the contract rather than changing it; it has the user's approval (2026-10-02, "go with your recommendations"). A reader who counts it as removing a stop point would call it MAJOR.
+
 ## [1.1.3] — 20261002 14:08
 
 ### Changed
