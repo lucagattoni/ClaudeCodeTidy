@@ -28,7 +28,7 @@ Every run — whatever target class it covers — goes through the same eight ph
 | 7 | Apply | Executes RELOCATE → COMPRESS → DELETE, in that order, then a no-loss check and a self-review loop. |
 | 8 | Record | Writes a permanent log of the run. See [Run logs](#run-logs). |
 
-Report mode (`--report`) is a cheap shortcut that runs phases 1–2 and 8 (it reads the rules but never bootstraps them, and it records the run) around a shallow mechanical pre-check (line/token counts, an unverified verdict-mix guess) — never a substitute for a real run, but useful to gauge "how bad is this file right now?" before committing to a full pass.
+Report mode (`--report`) is a cheap shortcut that runs phases 1–2 and 8 (it skips the versioning check, reads the rules but never bootstraps them, and records the run) around a shallow mechanical pre-check (line/token counts, an unverified verdict-mix guess) — never a substitute for a real run, but useful to gauge "how bad is this file right now?" before committing to a full pass.
 
 ## Target classes
 
@@ -89,7 +89,7 @@ Before touching anything, every run works through:
 4. **Visibility check** — public or unknown-visibility repos activate the global PRIMARY CHECK for every file this skill writes.
 5. **Encryption check** — git-crypt/SOPS/age references force any unlock instructions to KEEP (never RELOCATE, to avoid a lock-out) and gate other relocations on matching encryption scope.
 6. **CI-dependency check** — if a CI script greps the target file's content, that content can't be RELOCATEd without your explicit confirmation.
-7. **User-level versioning check** — if the run might write under `~/.claude` (including the phase-2 bootstrap of the rules file, outside `--report`), offers (never forces) a one-time bootstrap: a git repo there with an ignore-all `.gitignore` that tracks only instruction files, so `~/.claude` edits get history and reverts while credentials, transcripts, memory, and plugins stay untracked by default.
+7. **User-level versioning check** — skipped in `--report` (proposing a `git init` is an edit); otherwise, if the run might write under `~/.claude` (including the phase-2 bootstrap of the rules file), offers (never forces) a one-time bootstrap: a git repo there with an ignore-all `.gitignore` that tracks only instruction files, so `~/.claude` edits get history and reverts while credentials, transcripts, memory, and plugins stay untracked by default.
 
 ## Applying changes
 
@@ -145,7 +145,7 @@ These logs are the training data for the reflect skill.
 
 Self-improvement can never remove or weaken these autonomously — any lesson touching one is presented to you with pros and cons, applied only on your explicit approval.
 
-1. **Reversibility gate** — autonomous edits only when every change is individually revertible; unversioned or unprotected files always wait for your approval; intent, preference, scope, and out-of-repo writes always stop for you, regardless of tier. *(Rewrote the former stop-and-confirm invariant, with explicit approval, 2026-07-08.)*
+1. **Reversibility gate** — autonomous edits only when every change is individually revertible; unversioned or unprotected files always wait for your approval; intent, preference, scope, and out-of-repo writes always stop for you, regardless of tier. *(Rewrote the former stop-and-confirm invariant, with explicit approval, 2026-07-08.)* *(One recorded exception, user decision 2026-10-02: phase 2's one-time rules-file bootstrap copies a bundled seed to a new file, autonomously and announced; if you declined the versioning check it asks first.)*
 2. **No-loss guarantee** — slimming relocates content; nothing is ever lost.
 3. **Evidence before DELETE** — every deletion cites a located duplicate or a verified-gone reference.
 4. **PRIMARY CHECK** — public or unknown-visibility repos get the sensitive-content gate on every file this skill writes.
