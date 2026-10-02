@@ -1,7 +1,7 @@
 ---
 name: groom
 description: Audit and slim Claude Code instruction files against the global "CLAUDE.md hygiene" rules — project and user-level CLAUDE.md, .claude/rules, SKILL.md files (--skills), and auto memory (--memory) — by relocating/compressing content, never losing information. Use when the user asks to tidy, slim, audit, or clean up a CLAUDE.md, their skills, rules, or memory.
-version: 1.1.2
+version: 1.1.3
 ---
 
 # /claudecodetidy:groom
