@@ -4,7 +4,7 @@ Claude Code reads several kinds of instruction files before it does anything els
 
 ClaudeCodeTidy is a Claude Code plugin that audits and slims these instruction files — never your actual code. It works the way you'd refactor, not just delete: content moves to its correct home, verbose rules get compressed, only confirmed-dead content is removed, and anything only you can judge is raised as a question instead of guessed at. A second skill learns from real tidy runs and improves the first — evidence-only, never a guess.
 
-**Version 1.1.1** · [Changelog](CHANGELOG.md)
+**Version 1.1.2** · [Changelog](CHANGELOG.md)
 
 ## New to Claude Code?
 
@@ -30,7 +30,7 @@ Every tidy run: builds a picture of your repo → questions every line against s
 
 ## Install
 
-`/claudecodetidy:groom` reads its rules from `~/.claude/rules/claude-md-hygiene.md` — a path-scoped rule file in your **global** Claude directory. It loads by itself only when you read a CLAUDE.md inside the current project, not for one outside it (such as `~/.claude/CLAUDE.md` read from another project), so keep a one-line pointer to it in your global CLAUDE.md; sessions that never read a CLAUDE.md pay no context for it. Setups that still keep the rules as a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in `~/.claude/CLAUDE.md` keep working: `groom` falls back to that section. **If neither exists yet, the skill bootstraps the rules file automatically** the first time you run it: it copies [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to `~/.claude/rules/claude-md-hygiene.md` (never into a CLAUDE.md) and tells you it did so — a one-time seed, not an ongoing copy.
+`/claudecodetidy:groom` reads its rules from `~/.claude/rules/claude-md-hygiene.md` — a path-scoped rule file in your **global** Claude directory. It loads by itself only when you read a CLAUDE.md inside the current project, not for one outside it (such as `~/.claude/CLAUDE.md` read from another project), so keep a one-line pointer to it in your global CLAUDE.md; sessions that never read a CLAUDE.md pay no context for it. Setups that still keep the rules as a `## CLAUDE.md hygiene — keep every CLAUDE.md slim` section in `~/.claude/CLAUDE.md` keep working: `groom` falls back to that section. **If neither exists yet, the skill bootstraps the rules file automatically** the first time you run it (not in `--report`; if you declined the versioning check it shows you the copy and asks first): it copies [`HYGIENE-RULES-TEMPLATE.md`](HYGIENE-RULES-TEMPLATE.md) verbatim to `~/.claude/rules/claude-md-hygiene.md` (never into a CLAUDE.md) and tells you it did so — a one-time seed, not an ongoing copy.
 
 ```
 /plugin marketplace add lucagattoni/ClaudeCodeTidy

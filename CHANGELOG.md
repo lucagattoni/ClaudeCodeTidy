@@ -4,6 +4,13 @@ All notable changes to the suite (`groom` + `learn`). Follows semantic versionin
 
 ## [Unreleased]
 
+## [1.1.2] — 20261002 13:40
+
+### Fixed
+- **The rules-file bootstrap skipped the user-level versioning check, and ran in `--report` mode.** Step 0.7 offered the check only for a promote-to-global resolution or a user-level target, so a first run that copies `HYGIENE-RULES-TEMPLATE.md` to `~/.claude/rules/claude-md-hygiene.md` could write into an unversioned `~/.claude` without it (the old append to `~/.claude/CLAUDE.md` had the same gap), and report mode, documented as "no edits", could still bootstrap. Now Step 0.7 also triggers when Step 1 will bootstrap (outside `--report`); `--report` copies nothing, says no rules exist yet, and carries on with the mechanical tier and the Step 7 log; and when the user declined versioning at Step 0.7 the copy is confirm-first, per that step's existing rule for `~/.claude` writes (a declined copy stops the run with a pointer to the template). README and `docs/reference.md` (phase 2, report mode, preflight 7) follow. Found by the fresh reviewer of 1.1.0.
+
+**Bump note:** applied as PATCH on the user's explicit instruction to close this gap (2026-10-02): no new step, verdict or capability, report mode no longer copies the rules file, and Step 0.7's existing confirm-first rule now also covers the bootstrap. By this suite's own table it is arguably a "stop points" change (MAJOR, which needs user approval); it is applied as PATCH because it restates existing rules rather than adding one. **Left open for the user:** on a versioned `~/.claude` the bootstrap is still autonomous (announced), whereas Step 4 and invariant 1 say every out-of-repo write stops for confirmation. After the user accepts versioning, the copy is uncommitted (to revert, delete the file), and the tension applies to project runs; in `--user` runs `~/.claude` is the repo. The exception predates 1.1.0 and was not touched.
+
 ## [1.1.1] — 20261001 14:04
 
 ### Fixed

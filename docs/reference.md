@@ -20,7 +20,7 @@ Every run — whatever target class it covers — goes through the same eight ph
 | # | Phase | What happens |
 |---|---|---|
 | 1 | Preflight | Checks the session isn't running a stale plugin version, syncs git, checks repo visibility and encryption/CI dependencies. See [Preflight checks](#preflight-checks). |
-| 2 | Load the rules | Reads the hygiene rules from your global rules file `~/.claude/rules/claude-md-hygiene.md` (falling back to the `CLAUDE.md hygiene` section of `~/.claude/CLAUDE.md`) — the skill has no rules baked into itself. |
+| 2 | Load the rules | Reads the hygiene rules from your global rules file `~/.claude/rules/claude-md-hygiene.md` (falling back to the `CLAUDE.md hygiene` section of `~/.claude/CLAUDE.md`) — the skill has no rules baked into itself. A first run with neither bootstraps the rules file: never in `--report`, and without asking only when you haven't declined the versioning check of phase 1. |
 | 3 | Build a repo picture | A cheap orientation pass plus targeted verification of only the concrete claims the target file makes — never an open-ended read of the whole repo. |
 | 4 | Interrogate every line | Each line is checked against seven tests. See [The seven interrogation tests](#the-seven-interrogation-tests). |
 | 5 | Assign a verdict | Each block gets exactly one of five verdicts. See [The five verdicts](#the-five-verdicts). |
@@ -28,7 +28,7 @@ Every run — whatever target class it covers — goes through the same eight ph
 | 7 | Apply | Executes RELOCATE → COMPRESS → DELETE, in that order, then a no-loss check and a self-review loop. |
 | 8 | Record | Writes a permanent log of the run. See [Run logs](#run-logs). |
 
-Report mode (`--report`) is a cheap shortcut that runs phase 1 only, then a shallow mechanical pre-check (line/token counts, an unverified verdict-mix guess) — never a substitute for a real run, but useful to gauge "how bad is this file right now?" before committing to a full pass.
+Report mode (`--report`) is a cheap shortcut that runs phases 1–2 and 8 (it reads the rules but never bootstraps them, and it records the run) around a shallow mechanical pre-check (line/token counts, an unverified verdict-mix guess) — never a substitute for a real run, but useful to gauge "how bad is this file right now?" before committing to a full pass.
 
 ## Target classes
 
@@ -89,7 +89,7 @@ Before touching anything, every run works through:
 4. **Visibility check** — public or unknown-visibility repos activate the global PRIMARY CHECK for every file this skill writes.
 5. **Encryption check** — git-crypt/SOPS/age references force any unlock instructions to KEEP (never RELOCATE, to avoid a lock-out) and gate other relocations on matching encryption scope.
 6. **CI-dependency check** — if a CI script greps the target file's content, that content can't be RELOCATEd without your explicit confirmation.
-7. **User-level versioning check** — if the run might write under `~/.claude`, offers (never forces) a one-time bootstrap: a git repo there with an ignore-all `.gitignore` that tracks only instruction files, so `~/.claude` edits get history and reverts while credentials, transcripts, memory, and plugins stay untracked by default.
+7. **User-level versioning check** — if the run might write under `~/.claude` (including the phase-2 bootstrap of the rules file, outside `--report`), offers (never forces) a one-time bootstrap: a git repo there with an ignore-all `.gitignore` that tracks only instruction files, so `~/.claude` edits get history and reverts while credentials, transcripts, memory, and plugins stay untracked by default.
 
 ## Applying changes
 
